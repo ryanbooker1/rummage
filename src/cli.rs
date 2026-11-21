@@ -186,6 +186,10 @@ async fn run_name_search(
     let mut results: Vec<crate::app::SearchResult> = Vec::new();
     let mut seen: HashSet<String> = HashSet::new();
 
+    use std::io::IsTerminal;
+    let stderr_tty = std::io::stderr().is_terminal();
+    let mut progress_shown = false;
+
     while pending > 0 {
         match rx.recv().await {
             Some(NameSearchMsg::Batch(batch)) => {
@@ -201,12 +205,33 @@ async fn run_name_search(
                 pending = pending.saturating_sub(1);
             }
             Some(NameSearchMsg::Error(e)) => {
-                eprintln!("bs: {}", e);
+                if progress_shown { eprint!("\r\x1b[K"); }
+                eprintln!("rum: {}", e);
+                progress_shown = false;
                 pending = pending.saturating_sub(1);
+            }
+            Some(NameSearchMsg::Searching { count, current_dir, .. }) => {
+                if stderr_tty {
+                    use std::io::Write;
+                    if count > 0 {
+                        eprint!("\r\x1b[K  scanning: {} ({} found)", current_dir, count);
+                    } else {
+                        eprint!("\r\x1b[K  scanning: {}", current_dir);
+                    }
+                    let _ = std::io::stderr().flush();
+                    progress_shown = true;
+                }
             }
             Some(_) => {}
             None => break,
         }
+    }
+
+    // Clear the progress line before printing results.
+    if progress_shown {
+        use std::io::Write;
+        eprint!("\r\x1b[K");
+        let _ = std::io::stderr().flush();
     }
 
     // Sort by score descending and truncate.
