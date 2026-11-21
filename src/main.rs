@@ -91,7 +91,12 @@ async fn main() -> Result<()> {
     // Dispatch to non-TUI mode when a query was given.
     if cli_args.query.is_some() {
         cli::run_cli(&cli_args, &config, app.credentials.clone(), file_index).await;
-        return Ok(());
+        // Flush stdout before exiting — output may be buffered when piped.
+        // Exit immediately rather than waiting for Tokio to drain background
+        // search threads (spawn_blocking walkdir tasks), which would hang.
+        use std::io::Write;
+        let _ = std::io::stdout().flush();
+        std::process::exit(0);
     }
 
     // Setup terminal
