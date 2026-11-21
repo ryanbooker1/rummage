@@ -32,7 +32,7 @@ impl Location {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
     /// When false, credentials are stored as plain JSON (600 perms) and no password is asked.
     /// When true, credentials are encrypted with the user's sudo password.
@@ -66,6 +66,24 @@ pub struct Settings {
     pub debug_level: u8,
 }
 
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            require_unlock_on_startup: false,
+            consecutive_search: false,
+            case_sensitive_search: false,
+            content_search: false,
+            search_target: String::new(),
+            editor: default_editor(),
+            search_mode: default_search_mode(),
+            status_bar_expanded: false,
+            status_bar_visible: true,
+            controls_bar_visible: true,
+            debug_level: 0,
+        }
+    }
+}
+
 fn default_editor() -> String {
     "nvim".to_string()
 }
@@ -91,13 +109,30 @@ pub struct Config {
 impl Config {
     pub fn load() -> Result<Self> {
         let path = config_path();
-        if !path.exists() {
-            return Ok(Config::default());
+        let mut config = if !path.exists() {
+            Config::default()
+        } else {
+            let content = std::fs::read_to_string(&path)
+                .with_context(|| format!("Failed to read config at {}", path.display()))?;
+            toml::from_str(&content)
+                .with_context(|| "Failed to parse config.toml")?
+        };
+        if config.locations.is_empty() {
+            let home = dirs::home_dir()
+                .unwrap_or_else(|| PathBuf::from("/"))
+                .to_string_lossy()
+                .into_owned();
+            config.locations.push(Location {
+                id:       Config::generate_location_id(),
+                name:     "Home".to_string(),
+                kind:     "local".to_string(),
+                path:     home,
+                ssh_host: None,
+                ssh_port: 22,
+                ssh_user: None,
+                enabled:  true,
+            });
         }
-        let content = std::fs::read_to_string(&path)
-            .with_context(|| format!("Failed to read config at {}", path.display()))?;
-        let config: Config = toml::from_str(&content)
-            .with_context(|| "Failed to parse config.toml")?;
         Ok(config)
     }
 

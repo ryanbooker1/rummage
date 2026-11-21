@@ -746,8 +746,8 @@ fn render_results(f: &mut Frame, area: Rect, app: &App) {
         if no_locations {
             f.render_widget(
                 Paragraph::new(Span::styled(
-                    "✗ No locations configured — open settings to add one (Tab)",
-                    Theme::error(),
+                    "⚠ No locations configured — searches your home directory by default (Tab to add more)",
+                    Theme::warning(),
                 )),
                 row0,
             );
