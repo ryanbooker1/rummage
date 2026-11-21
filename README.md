@@ -4,6 +4,8 @@ A fast, fuzzy file finder with an interactive TUI and SSH support. Search local
 and remote filesystems simultaneously, open results directly in your editor, and
 browse the file tree — all from the terminal.
 
+![rummage search results](docs/screenshot-search.png)
+
 ## Features
 
 - **Fuzzy and consecutive matching** — standard fuzzy search or ordered-letter mode
@@ -16,7 +18,58 @@ browse the file tree — all from the terminal.
 - **CLI mode** — pipe results to other tools: `rum '*.rs' | xargs grep TODO`
 - **Man page** — `man rum`
 
+## Screenshots
+
+**Idle — ready to search:**
+
+![rummage idle](docs/screenshot-idle.png)
+
+**Search results — 351 matches for "json":**
+
+![rummage search results](docs/screenshot-search.png)
+
 ## Installation
+
+### NixOS (flakes)
+
+Add rummage to your flake inputs and include it in your system packages:
+
+```nix
+# flake.nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    rummage = {
+      url = "github:ryanbooker1/rummage";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { nixpkgs, rummage, ... }: {
+    nixosConfigurations.myhostname = nixpkgs.lib.nixosSystem {
+      modules = [
+        ({ pkgs, ... }: {
+          environment.systemPackages = [
+            rummage.packages.${pkgs.system}.default
+          ];
+        })
+      ];
+    };
+  };
+}
+```
+
+Then rebuild:
+
+```bash
+sudo nixos-rebuild switch --flake .#myhostname
+```
+
+You can also run it without installing:
+
+```bash
+nix run github:ryanbooker1/rummage
+```
 
 ### NixOS (traditional configuration, no flakes)
 
@@ -44,7 +97,7 @@ let
       sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     };
 
-    cargoLock.lockFile = ./Cargo.lock;
+    cargoLock.lockFile = "${src}/Cargo.lock";
 
     nativeBuildInputs = with pkgs; [ pkg-config ];
     buildInputs       = with pkgs; [ openssl libssh2 zlib ];
@@ -78,22 +131,82 @@ Install [Nix](https://install.determinate.systems) on any distro, then:
 nix profile install github:ryanbooker1/rummage
 ```
 
-### Arch / Manjaro / Omarchy / Ubuntu (via Cargo)
+### Arch Linux / Manjaro / Omarchy
 
-Install system dependencies first:
+Install dependencies:
 
 ```bash
-# Arch / Manjaro / Omarchy
 sudo pacman -S pkg-config openssl libssh2
-
-# Ubuntu / Debian
-sudo apt install pkg-config libssl-dev libssh2-1-dev
 ```
 
-Then install:
+Install via Cargo:
 
 ```bash
 cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+### Ubuntu / Debian
+
+Install dependencies:
+
+```bash
+sudo apt install pkg-config libssl-dev libssh2-1-dev zlib1g-dev
+```
+
+Install via Cargo:
+
+```bash
+cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+### Fedora / RHEL / CentOS / Rocky Linux
+
+Install dependencies:
+
+```bash
+sudo dnf install pkg-config openssl-devel libssh2-devel zlib-devel
+```
+
+Install via Cargo:
+
+```bash
+cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+### openSUSE
+
+Install dependencies:
+
+```bash
+sudo zypper install pkg-config libopenssl-devel libssh2-devel zlib-devel
+```
+
+Install via Cargo:
+
+```bash
+cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+### Alpine Linux
+
+Install dependencies:
+
+```bash
+sudo apk add pkgconf openssl-dev libssh2-dev zlib-dev musl-dev
+```
+
+Install via Cargo:
+
+```bash
+cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+### Installing Rust / Cargo
+
+If you don't have Cargo installed, get it via [rustup](https://rustup.rs):
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 ## Usage
@@ -131,16 +244,16 @@ rum -0 '*.rs' | xargs -0 wc -l  # NUL-separated output for xargs
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
-| `--target` | `-t` | `files` | What to search: `files`, `dirs`, `all`, `content` |
+| `--target` | `-t` | `all` | What to search: `files`, `dirs`, `all`, `content` |
 | `--mode` | `-m` | `both` | Search mode: `index`, `live`, `both` |
 | `--content` | `-f` | off | Also grep file contents |
 | `--case-sensitive` | `-c` | off | Case-sensitive matching |
-| `--consecutive` | `-z` | off | Letters must appear in order, no gaps |
+| `--fuzzy` | `-z` | on | Fuzzy matching (disable for consecutive/ordered) |
 | `--location` | `-l` | all | Filter to one location by name or ID |
-| `--limit` | `-n` | `100` | Maximum results to print |
+| `--limit` | `-n` | unlimited | Maximum results to print |
 | `--null` | `-0` | off | NUL-separated output (for `xargs -0`) |
 
-CLI flags use built-in defaults and do not read or modify your saved settings.
+CLI defaults inherit from your saved TUI settings.
 
 ## Keyboard shortcuts
 
@@ -179,7 +292,7 @@ SSH host keys are verified using trust-on-first-use (TOFU) and stored in
 
 ## Building from source
 
-Requires Rust and the system libraries listed in the Cargo install section above.
+Requires Rust and the system libraries listed in the installation section above.
 
 ```bash
 git clone https://github.com/ryanbooker1/rummage
@@ -192,7 +305,7 @@ nix develop --command cargo build --release
 cargo build --release
 ```
 
-The binary is at `target/release/bs`. Copy it to anywhere on your `$PATH`.
+The binary is at `target/release/rum`. Copy it to anywhere on your `$PATH`.
 
 ## License
 
