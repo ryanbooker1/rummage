@@ -18,19 +18,19 @@ pub struct Cli {
     pub query: Option<String>,
 
     /// What to search: files, dirs, all, content (default: from saved settings)
-    #[arg(short, long, value_name = "TARGET")]
+    #[arg(short = 't', long = "search-target", value_name = "TARGET")]
     pub target: Option<String>,
 
     /// Search mode: index, live, both (default: from saved settings)
-    #[arg(short, long, value_name = "MODE")]
+    #[arg(short = 's', long = "search-mode", value_name = "MODE")]
     pub mode: Option<String>,
 
-    /// Also search inside file contents (default: from saved settings)
-    #[arg(short = 'f', long = "content")]
+    /// Search inside file contents (default: from saved settings)
+    #[arg(short = 'f', long = "search-file-content")]
     pub content_search: bool,
 
     /// Case-sensitive matching (default: from saved settings)
-    #[arg(short = 'c', long)]
+    #[arg(short = 'a', long = "case-sensitive")]
     pub case_sensitive: bool,
 
     /// Enable fuzzy matching: letters can be non-adjacent (e.g. 'ac' matches 'abc') (default: from saved settings)
