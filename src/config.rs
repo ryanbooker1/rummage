@@ -104,6 +104,11 @@ pub struct Config {
     pub credential_salt: Option<String>,
     #[serde(default)]
     pub settings: Settings,
+    /// Cached file counts per location-id from the last index build.
+    /// Stored in config so the TUI can display them instantly at startup
+    /// without reading the database.
+    #[serde(default)]
+    pub index_counts: std::collections::HashMap<String, usize>,
 }
 
 impl Config {

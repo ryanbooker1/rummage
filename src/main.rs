@@ -68,18 +68,50 @@ async fn main() -> Result<()> {
         db::create_tables(&conn)?;
     }
 
-    // Load file index into memory
     let file_index: Arc<RwLock<Vec<app::IndexedFile>>> = Arc::new(RwLock::new(Vec::new()));
-    {
-        let conn = db::open_db(&db_file)?;
-        let files = db::load_all_files(&conn, &config.locations)?;
-        if let Ok(mut idx) = file_index.write() {
-            *idx = files;
+
+    // CLI mode: load the index synchronously so searches work immediately.
+    if cli_args.query.is_some() {
+        {
+            let conn = db::open_db(&db_file)?;
+            let files = db::load_all_files(&conn, &config.locations)?;
+            if let Ok(mut idx) = file_index.write() {
+                *idx = files;
+            }
         }
+        // Load credentials
+        let credentials = if !config.settings.require_unlock_on_startup {
+            crypto::load_plain(&credentials_plain_path()).unwrap_or_default()
+        } else {
+            HashMap::new()
+        };
+        cli::run_cli(&cli_args, &config, credentials, file_index).await;
+        use std::io::Write;
+        let _ = std::io::stdout().flush();
+        std::process::exit(0);
     }
 
+    // TUI mode: build App immediately (counts seeded from cached config values),
+    // then load the full index in the background so the TUI opens instantly.
     let mut app = App::new(config.clone(), file_index.clone());
-    app.refresh_index_counts(); // populate cache from index loaded above
+
+    {
+        let (done_tx, done_rx) = tokio::sync::oneshot::channel::<()>();
+        let file_index_bg = file_index.clone();
+        let db_file_bg = db_file.clone();
+        let locations_bg = config.locations.clone();
+        tokio::task::spawn_blocking(move || {
+            if let Ok(conn) = db::open_db(&db_file_bg) {
+                if let Ok(files) = db::load_all_files(&conn, &locations_bg) {
+                    if let Ok(mut idx) = file_index_bg.write() {
+                        *idx = files;
+                    }
+                }
+            }
+            let _ = done_tx.send(());
+        });
+        app.index_load_done_rx = Some(done_rx);
+    }
 
     // If plain credential storage is enabled, load credentials immediately without prompting
     if !config.settings.require_unlock_on_startup {
@@ -91,17 +123,6 @@ async fn main() -> Result<()> {
         }
         // Always consider "unlocked" in non-secure mode (no password protection)
         app.master_password_unlocked = true;
-    }
-
-    // Dispatch to non-TUI mode when a query was given.
-    if cli_args.query.is_some() {
-        cli::run_cli(&cli_args, &config, app.credentials.clone(), file_index).await;
-        // Flush stdout before exiting — output may be buffered when piped.
-        // Exit immediately rather than waiting for Tokio to drain background
-        // search threads (spawn_blocking walkdir tasks), which would hang.
-        use std::io::Write;
-        let _ = std::io::stdout().flush();
-        std::process::exit(0);
     }
 
     // Setup terminal
@@ -183,6 +204,20 @@ async fn run_app(
             }
         }
 
+        // Check whether the background index load (deferred from startup) has finished.
+        let index_load_just_done = if let Some(rx) = &mut app.index_load_done_rx {
+            matches!(rx.try_recv(), Ok(()))
+        } else {
+            false
+        };
+        if index_load_just_done {
+            app.index_load_done_rx = None;
+            app.refresh_index_counts();
+            config.index_counts = app.config.index_counts.clone();
+            config.save().ok();
+            app.config = config.clone();
+        }
+
         // Check for index channel messages — drain into Vec first to avoid borrow issues
         let index_msgs: Vec<IndexMsg> = if let Some(rx) = &mut app.index_rx {
             let mut msgs = Vec::new();
@@ -237,6 +272,7 @@ async fn run_app(
             }
             app.refresh_index_counts();
             config.last_db_build = Some(chrono::Utc::now().to_rfc3339());
+            config.index_counts = app.config.index_counts.clone();
             config.save().ok();
             app.config = config.clone();
             app.set_status("Index rebuilt successfully", StatusLevel::Success);

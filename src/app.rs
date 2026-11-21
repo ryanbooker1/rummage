@@ -447,6 +447,8 @@ pub struct App {
     /// True when a debounce timer is active (query changed but search hasn't started yet).
     /// Set by the main loop before each draw; prevents rendering "complete" state during typing.
     pub search_pending: bool,
+    /// Fires once when the background index load (deferred from startup) completes.
+    pub index_load_done_rx: Option<tokio::sync::oneshot::Receiver<()>>,
 }
 
 impl App {
@@ -454,6 +456,9 @@ impl App {
         let has_ssh = config.locations.iter().any(|l| l.kind == "ssh" && l.enabled);
         let require_unlock = config.settings.require_unlock_on_startup;
         let content_search = config.settings.content_search;
+        // Extract cached counts before config is moved into the struct.
+        let cached_location_counts = config.index_counts.clone();
+        let cached_total: usize = config.index_counts.values().sum();
         let search_target = match config.settings.search_target.as_str() {
             "dirs"    => SearchTarget::Folders,
             "all"     => SearchTarget::Both,
@@ -515,8 +520,8 @@ impl App {
             completed_locations: std::collections::HashSet::new(),
             pending_help_content: None,
             search_stopped: false,
-            index_location_counts: HashMap::new(),
-            index_total_count: 0,
+            index_location_counts: cached_location_counts,
+            index_total_count: cached_total,
             active_location: None,
             search_mode,
             status_bar_expanded,
@@ -543,6 +548,7 @@ impl App {
             location_popup_selected: 0,
             show_debug_overlay: false,
             search_pending: false,
+            index_load_done_rx: None,
         }
     }
 
@@ -560,7 +566,9 @@ impl App {
             for f in idx.iter() {
                 *counts.entry(f.location_id.clone()).or_insert(0) += 1;
             }
-            self.index_location_counts = counts;
+            self.index_location_counts = counts.clone();
+            // Mirror into config so callers that follow with config.save() persist the counts.
+            self.config.index_counts = counts;
         }
     }
 
