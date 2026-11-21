@@ -107,7 +107,9 @@ fn render_logo(f: &mut Frame, area: Rect, app: &App) {
     }
 
     let w = area.width as usize;
-    let searching = app.name_search_active || app.content_search_active || app.search_pending;
+    let no_active_locs = app.config.locations.is_empty()
+        || app.config.locations.iter().all(|l| !l.enabled);
+    let searching = !no_active_locs && (app.name_search_active || app.content_search_active || app.search_pending);
     let vis_count = app.visible_count;
     let total = app.results.len();
 
@@ -189,7 +191,10 @@ fn render_status_bar(f: &mut Frame, area: Rect, app: &App) {
     if !app.status_bar_visible { return; }
 
     // Include search_pending so the status stays orange during debounce (prevents flash to green).
-    let searching = app.name_search_active || app.content_search_active || app.search_pending;
+    // Skip when no locations are configured — nothing will search, so never show "Searching" state.
+    let no_active_locs = app.config.locations.is_empty()
+        || app.config.locations.iter().all(|l| !l.enabled);
+    let searching = !no_active_locs && (app.name_search_active || app.content_search_active || app.search_pending);
     let total_results = app.results.len();
 
     let state_str = if searching {
@@ -735,10 +740,20 @@ fn render_results(f: &mut Frame, area: Rect, app: &App) {
         let row0 = Rect::new(list_area.x, list_area.y,     list_area.width, 1);
         let row1 = Rect::new(list_area.x, list_area.y + 1, list_area.width, list_area.height.saturating_sub(1));
 
-        if no_locations {
+        if mode_is_index && index_empty && app.query.len() >= 2 && !app.name_search_active {
+            // Index mode + empty index + active query: always show the actionable index error,
+            // even when no locations are configured — the root fix is the same either way.
             f.render_widget(
                 Paragraph::new(Span::styled(
-                    "⚠ No locations configured — searches your home directory by default (Tab to add more)",
+                    "✗ No indexed files — press ^R to build the index, or switch to Live or Both mode (^S)",
+                    Theme::error(),
+                )),
+                row0,
+            );
+        } else if no_locations {
+            f.render_widget(
+                Paragraph::new(Span::styled(
+                    "⚠ No locations configured — Tab to add one",
                     Theme::warning(),
                 )),
                 row0,
@@ -784,11 +799,6 @@ fn render_results(f: &mut Frame, area: Rect, app: &App) {
                     "Type at least 2 characters to search...".to_string()
                 };
                 (text, Theme::dim())
-            } else if mode_is_index && index_empty && !app.name_search_active {
-                (
-                    "✗ No indexed files — press ^R to build the index, or switch to Live or Both mode (^S)".to_string(),
-                    Theme::error(),
-                )
             } else if app.name_search_active || app.content_search_active {
                 ("Searching…".to_string(), Theme::status_searching())
             } else if !app.results.is_empty() {
