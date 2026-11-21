@@ -17,23 +17,23 @@ pub struct Cli {
     /// Search query (omit to open the interactive TUI)
     pub query: Option<String>,
 
-    /// What to search: files, dirs, all, content
-    #[arg(short, long, default_value = "files", value_name = "TARGET")]
-    pub target: String,
+    /// What to search: files, dirs, all, content (default: from saved settings)
+    #[arg(short, long, value_name = "TARGET")]
+    pub target: Option<String>,
 
-    /// Search mode: index, live, both
-    #[arg(short, long, default_value = "both", value_name = "MODE")]
-    pub mode: String,
+    /// Search mode: index, live, both (default: from saved settings)
+    #[arg(short, long, value_name = "MODE")]
+    pub mode: Option<String>,
 
-    /// Also search inside file contents (grep)
+    /// Also search inside file contents (default: from saved settings)
     #[arg(short = 'f', long = "content")]
     pub content_search: bool,
 
-    /// Case-sensitive matching
+    /// Case-sensitive matching (default: from saved settings)
     #[arg(short = 'c', long)]
     pub case_sensitive: bool,
 
-    /// Consecutive matching: query characters must appear in order with no gaps
+    /// Consecutive matching: query characters must appear in order with no gaps (default: from saved settings)
     #[arg(short = 'z', long)]
     pub consecutive: bool,
 
@@ -66,7 +66,14 @@ pub async fn run_cli(
         std::process::exit(1);
     }
 
-    let target = match cli.target.as_str() {
+    // Resolve each option: CLI flag takes priority, then saved config settings.
+    let target_str = cli.target.as_deref().unwrap_or(&config.settings.search_target).to_string();
+    let mode_str   = cli.mode.as_deref().unwrap_or(&config.settings.search_mode).to_string();
+    let use_content     = cli.content_search     || config.settings.content_search;
+    let use_consecutive = cli.consecutive        || config.settings.consecutive_search;
+    let use_case_sensitive = cli.case_sensitive  || config.settings.case_sensitive_search;
+
+    let target = match target_str.as_str() {
         "dirs"    => SearchTarget::Folders,
         "all"     => SearchTarget::Both,
         "content" => SearchTarget::Content,
@@ -94,8 +101,8 @@ pub async fn run_cli(
     if target != SearchTarget::Content {
         let results = run_name_search(
             &query, config, &credentials, &file_index,
-            target, cli.consecutive, cli.case_sensitive,
-            &loc_filter, cli.limit, &cli.mode,
+            target, use_consecutive, use_case_sensitive,
+            &loc_filter, cli.limit, &mode_str,
         ).await;
 
         for r in &results {
@@ -112,10 +119,10 @@ pub async fn run_cli(
     }
 
     // ── Content search ───────────────────────────────────────────────────────
-    if cli.content_search || target == SearchTarget::Content {
+    if use_content || target == SearchTarget::Content {
         run_content_search(
             &query, config, &credentials,
-            cli.case_sensitive, &loc_filter, cli.limit, sep,
+            use_case_sensitive, &loc_filter, cli.limit, sep,
         ).await;
     }
 }
