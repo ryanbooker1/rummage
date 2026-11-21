@@ -123,10 +123,10 @@ nix profile install github:ryanbooker1/rummage
 
 ### Arch Linux / Manjaro / Omarchy
 
-Install dependencies:
+Install Rust and dependencies:
 
 ```bash
-sudo pacman -S pkg-config openssl libssh2
+sudo pacman -S rust pkg-config openssl libssh2 zlib
 ```
 
 Install via Cargo:
