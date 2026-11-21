@@ -4,7 +4,7 @@ A fast, fuzzy file finder with an interactive TUI and SSH support. Search local
 and remote filesystems simultaneously, open results directly in your editor, and
 browse the file tree — all from the terminal.
 
-![rummage search results](docs/screenshot-search.png)
+![rummage](docs/screenshot.png)
 
 ## Features
 
@@ -17,16 +17,6 @@ browse the file tree — all from the terminal.
 - **Smart location filtering** — `^L` filters in-place when results are ready, restarts only when needed
 - **CLI mode** — pipe results to other tools: `rum '*.rs' | xargs grep TODO`
 - **Man page** — `man rum`
-
-## Screenshots
-
-**Idle — ready to search:**
-
-![rummage idle](docs/screenshot-idle.png)
-
-**Search results — 351 matches for "json":**
-
-![rummage search results](docs/screenshot-search.png)
 
 ## Installation
 
