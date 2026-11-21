@@ -33,16 +33,16 @@ pub struct Cli {
     #[arg(short = 'c', long)]
     pub case_sensitive: bool,
 
-    /// Consecutive matching: query characters must appear in order with no gaps (default: from saved settings)
+    /// Enable fuzzy matching: letters can be non-adjacent (e.g. 'ac' matches 'abc') (default: from saved settings)
     #[arg(short = 'z', long)]
-    pub consecutive: bool,
+    pub fuzzy: bool,
 
     /// Restrict to a location by name or ID
     #[arg(short, long, value_name = "LOCATION")]
     pub location: Option<String>,
 
-    /// Maximum number of results to output
-    #[arg(short = 'n', long, default_value = "100", value_name = "N")]
+    /// Maximum number of results to output (0 = unlimited)
+    #[arg(short = 'n', long, default_value = "0", value_name = "N")]
     pub limit: usize,
 
     /// Separate output paths with NUL bytes instead of newlines (for xargs -0)
@@ -69,9 +69,12 @@ pub async fn run_cli(
     // Resolve each option: CLI flag takes priority, then saved config settings.
     let target_str = cli.target.as_deref().unwrap_or(&config.settings.search_target).to_string();
     let mode_str   = cli.mode.as_deref().unwrap_or(&config.settings.search_mode).to_string();
-    let use_content     = cli.content_search     || config.settings.content_search;
-    let use_consecutive = cli.consecutive        || config.settings.consecutive_search;
-    let use_case_sensitive = cli.case_sensitive  || config.settings.case_sensitive_search;
+    let use_content        = cli.content_search || config.settings.content_search;
+    let use_case_sensitive = cli.case_sensitive || config.settings.case_sensitive_search;
+    // --fuzzy turns fuzzy ON (consecutive OFF); without the flag, use the saved setting.
+    let use_consecutive = if cli.fuzzy { false } else { config.settings.consecutive_search };
+    // 0 = unlimited; use a sentinel that won't overflow when doubled in comparisons.
+    let limit = if cli.limit == 0 { usize::MAX / 2 } else { cli.limit };
 
     let target = match target_str.as_str() {
         "dirs"    => SearchTarget::Folders,
@@ -102,7 +105,7 @@ pub async fn run_cli(
         let results = run_name_search(
             &query, config, &credentials, &file_index,
             target, use_consecutive, use_case_sensitive,
-            &loc_filter, cli.limit, &mode_str,
+            &loc_filter, limit, &mode_str,
         ).await;
 
         for r in &results {
@@ -122,7 +125,7 @@ pub async fn run_cli(
     if use_content || target == SearchTarget::Content {
         run_content_search(
             &query, config, &credentials,
-            use_case_sensitive, &loc_filter, cli.limit, sep,
+            use_case_sensitive, &loc_filter, limit, sep,
         ).await;
     }
 }
