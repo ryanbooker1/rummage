@@ -1,6 +1,6 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::Style,
+    style::{Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragraph, Wrap},
     Frame,
@@ -242,15 +242,20 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
         );
 
         let input_line = if field == &InputField::Type {
-            // Render as a clear toggle button
-            let (local_style, ssh_style) = if app.form.is_ssh {
+            // Render as radio-button style toggle — no background fill to avoid
+            // looking like a selected row.
+            let (local_indicator, ssh_indicator, local_style, ssh_style) = if app.form.is_ssh {
                 (
+                    "○",
+                    "◉",
                     Style::default().fg(FG4).bg(BG),
-                    Style::default().fg(BG).bg(AQUA),
+                    Style::default().fg(AQUA).bg(BG).add_modifier(Modifier::BOLD),
                 )
             } else {
                 (
-                    Style::default().fg(BG).bg(AQUA),
+                    "◉",
+                    "○",
+                    Style::default().fg(AQUA).bg(BG).add_modifier(Modifier::BOLD),
                     Style::default().fg(FG4).bg(BG),
                 )
             };
@@ -261,10 +266,12 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
             };
             Line::from(vec![
                 Span::styled("  ", Style::default().bg(BG)),
-                Span::styled(" Local ", local_style),
-                Span::styled("  ", Style::default().bg(BG)),
-                Span::styled(" SSH ", ssh_style),
-                Span::styled("  ◄► or Space to switch", hint_style),
+                Span::styled(local_indicator, local_style),
+                Span::styled(" Local", local_style),
+                Span::styled("    ", Style::default().bg(BG)),
+                Span::styled(ssh_indicator, ssh_style),
+                Span::styled(" SSH", ssh_style),
+                Span::styled("    ◄► or Space to switch", hint_style),
             ])
         } else {
             let value = if field == &InputField::SshPassword {
