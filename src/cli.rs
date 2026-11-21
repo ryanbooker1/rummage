@@ -245,7 +245,6 @@ async fn run_name_search(
                     progress_shown = true;
                 }
             }
-            Some(_) => {}
             None => break,
         }
     }
