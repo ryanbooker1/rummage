@@ -803,7 +803,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         // Give the blocking task a moment to run
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
@@ -821,7 +821,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("XYZZY_NOTFOUND".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("XYZZY_NOTFOUND".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
@@ -838,7 +838,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("foo.bar".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("foo.bar".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
@@ -856,7 +856,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
@@ -876,7 +876,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
@@ -896,7 +896,7 @@ mod tests {
         let (tx, mut rx) = mpsc::channel(64);
         let (_, cancel_rx) = mpsc::channel(1);
         let loc = make_location(&dir);
-        search_contents("MARKER".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("MARKER".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
@@ -913,7 +913,7 @@ mod tests {
         let (_, cancel_rx) = mpsc::channel(1);
         let mut loc = make_location(&dir);
         loc.enabled = false;
-        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx).await;
+        search_contents("TODO".to_string(), vec![loc], HashMap::new(), tx, cancel_rx, std::sync::Arc::new(std::sync::Mutex::new(HashMap::new()))).await;
 
         tokio::time::sleep(std::time::Duration::from_millis(200)).await;
 
