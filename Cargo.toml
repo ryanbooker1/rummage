@@ -1,16 +1,12 @@
 [package]
-name = "booker-search"
+name = "rummage"
 version = "0.1.0"
 edition = "2021"
-default-run = "bs"
+default-run = "rum"
 
 [[bin]]
-name = "bs"
+name = "rum"
 path = "src/main.rs"
-
-[[bin]]
-name = "test_ssh_search"
-path = "src/bin/test_ssh_search.rs"
 
 [[bin]]
 name = "header_demo"

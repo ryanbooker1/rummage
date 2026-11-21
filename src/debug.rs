@@ -30,7 +30,7 @@ pub fn log(level: u8, msg: &str) {
                 let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
                 std::path::PathBuf::from(home).join(".local/share")
             });
-        let dir = base.join("booker-search");
+        let dir = base.join("rummage");
         let _ = std::fs::create_dir_all(&dir);
         dir.join("debug.log")
     };

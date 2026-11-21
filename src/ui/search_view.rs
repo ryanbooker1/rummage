@@ -111,11 +111,11 @@ fn render_logo(f: &mut Frame, area: Rect, app: &App) {
     let vis_count = app.visible_count;
     let total = app.results.len();
 
-    // ── Row 0: ╭─ booker-search ─...─╮ ──────────────────────────────────
-    let title_prefix_w = 17usize; // "╭─ booker-search " = 17 chars (3 + 13 + 1)
+    // ── Row 0: ╭─ rummage ─...─╮ ──────────────────────────────────
+    let title_prefix_w = 12usize; // "╭─ rummage " = 12 chars (3 + 7 + 1 + 1)
     let top_line = Line::from(vec![
         Span::styled("╭─ ",          Theme::primary()),
-        Span::styled("booker-search", Style::default().fg(AQUA).add_modifier(Modifier::BOLD)),
+        Span::styled("rummage", Style::default().fg(AQUA).add_modifier(Modifier::BOLD)),
         Span::styled(format!(" {}╮", "─".repeat(w.saturating_sub(title_prefix_w + 1))),
                      Theme::primary()),
     ]);
@@ -1885,7 +1885,7 @@ fn render_popup_help(f: &mut Frame, area: Rect, app: &App) {
         let row_area = Rect::new(area.x, area.y + i as u16, text_w as u16, 1);
         let style = if line.starts_with("━") || line.starts_with("─") {
             Theme::dim()
-        } else if line.ends_with("(1)") && (line.starts_with("BOOKER") || line.starts_with("bs")) {
+        } else if line.ends_with("(1)") && (line.starts_with("RUMMAGE") || line.starts_with("rum")) {
             Theme::dim()
         } else if !line.starts_with(' ') && !line.is_empty() && line.chars().next().map(|c| c.is_uppercase()).unwrap_or(false) {
             // Section headers: NAME, KEYBOARD SHORTCUTS, WILDCARD SEARCH, etc.

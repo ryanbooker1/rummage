@@ -1,12 +1,12 @@
-.TH BS 1 "November 2026" "booker-search 0.1.0" "User Commands"
+.TH RUM 1 "November 2026" "rummage 0.1.0" "User Commands"
 .SH NAME
-bs \- fuzzy file finder with SSH support
+rum \- fuzzy file finder with SSH support
 .SH SYNOPSIS
-.B bs
+.B rum
 .RI [ OPTIONS ]
 .RI [ QUERY ]
 .SH DESCRIPTION
-.B bs
+.B rum
 is a fuzzy file finder with an interactive TUI and SSH support.
 When invoked without arguments it opens the interactive interface.
 When a
@@ -83,7 +83,7 @@ Print the version number and exit.
 When run without a
 .I QUERY
 argument,
-.B bs
+.B rum
 opens a full\-screen interactive TUI.
 The index is searched as you type; live searches start after a short debounce.
 .SS Navigation
@@ -284,7 +284,7 @@ In CLI mode, only plain\-storage credentials and SSH agent authentication
 are available; there is no prompt for a master password.
 .SH LOCATIONS
 Each location is a directory that
-.B bs
+.B rum
 indexes and searches.
 Local locations are walked on disk.
 SSH locations connect over SSH.
@@ -307,61 +307,61 @@ Use
 .B ^Z
 in the location edit form to test a connection before saving.
 SSH host keys are verified using trust\-on\-first\-use (TOFU) and stored in
-.IR ~/.config/booker\-search/known_hosts .
+.IR ~/.config/rummage/known_hosts .
 A host\-key mismatch aborts the connection with a warning.
 .SH FILES
 .TP
-.I ~/.config/booker\-search/config.toml
+.I ~/.config/rummage/config.toml
 Main configuration file (locations, settings).
 .TP
-.I ~/.config/booker\-search/bs.db
+.I ~/.config/rummage/index.db
 SQLite database used as the search index.
 .TP
-.I ~/.config/booker\-search/credentials.json
+.I ~/.config/rummage/credentials.json
 SSH passwords in plain text (permissions 600).
 Used when
 .B Require Unlock on Startup
 is off.
 .TP
-.I ~/.config/booker\-search/credentials.enc
+.I ~/.config/rummage/credentials.enc
 SSH passwords encrypted with AES\-256\-GCM and an Argon2\-derived key.
 Used when
 .B Require Unlock on Startup
 is on.
 .TP
-.I ~/.config/booker\-search/known_hosts
+.I ~/.config/rummage/known_hosts
 SSH host keys accepted by
-.B bs
+.B rum
 (OpenSSH format, permissions 600).
 .SH EXAMPLES
 .PP
 Open the interactive TUI:
 .IP
-.B bs
+.B rum
 .PP
 Find all Rust source files:
 .IP
-.B "bs '*.rs'"
+.B "rum '*.rs'"
 .PP
 Find files matching \(lqmain\(rq with a live scan:
 .IP
-.B "bs \-m live main"
+.B "rum \-m live main"
 .PP
 Search file contents for \(lqTODO\(rq:
 .IP
-.B "bs \-f TODO"
+.B "rum \-f TODO"
 .PP
 Case\-sensitive search for \(lqConfig\(rq in directories only:
 .IP
-.B "bs \-c \-t dirs Config"
+.B "rum \-c \-t dirs Config"
 .PP
 Search only the \(lqwork\(rq location and pipe to fzf:
 .IP
-.B "bs \-l work query | fzf"
+.B "rum \-l work query | fzf"
 .PP
 Feed results to xargs (NUL\-separated):
 .IP
-.B "bs \-0 '*.toml' | xargs \-0 grep \-l dependencies"
+.B "rum \-0 '*.toml' | xargs \-0 grep \-l dependencies"
 .SH SEE ALSO
 .BR find (1),
 .BR grep (1),

@@ -173,7 +173,7 @@ fn opt1(f: &mut ratatui::Frame, area: Rect) {
 // ── Option 2: Two-row name+count / settings ──────────────────────────────────
 fn opt2(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 0, Line::from(vec![
-        Span::styled(" booker-search", bold(AQUA)),
+        Span::styled(" rummage", bold(AQUA)),
         Span::styled("  ─────────────────────────────────────────────────  ", fg(BG2)),
         Span::styled("42 results ", bold(FG)),
     ]));
@@ -238,7 +238,7 @@ fn opt4(f: &mut ratatui::Frame, area: Rect) {
 fn opt5(f: &mut ratatui::Frame, area: Rect) {
     // Full-width inverse colour strip for row 0
     let w = area.width as usize;
-    let title = " booker-search";
+    let title = " rummage";
     let count = "42 results ";
     let pad = w.saturating_sub(title.len() + count.len());
     row(f, area, 0, Line::from(vec![
@@ -308,7 +308,7 @@ fn opt7(f: &mut ratatui::Frame, area: Rect) {
 fn opt8(f: &mut ratatui::Frame, area: Rect) {
     let w = area.width as usize;
     row(f, area, 0, Line::from(vec![
-        Span::styled(" booker-search", bold(AQUA)),
+        Span::styled(" rummage", bold(AQUA)),
         Span::styled("   ─── ", fg(BG2)),
         Span::styled("42 results", bold(FG)),
     ]));
@@ -379,12 +379,12 @@ fn opt10(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 2, Line::from(""));
 }
 
-// ── Option 11: Card outline (opt4) + powerline interior (opt3, no "bs") ─────
+// ── Option 11: Card outline (opt4) + powerline interior (opt3, no "rum") ─────
 fn opt11(f: &mut ratatui::Frame, area: Rect) {
     let w = area.width as usize;
 
-    // Top border: ╭─ booker-search ─...─╮
-    let title_prefix = "╭─ booker-search ";
+    // Top border: ╭─ rummage ─...─╮
+    let title_prefix = "╭─ rummage ";
     let top = format!("{}{}╮", title_prefix, "─".repeat(w.saturating_sub(title_prefix.len() + 1)));
     row(f, area, 0, Line::from(Span::styled(top, fg(AQUA))));
 

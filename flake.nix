@@ -1,5 +1,5 @@
 {
-  description = "booker-search — fuzzy file finder TUI with SSH support";
+  description = "rummage — fuzzy file finder TUI with SSH support";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -36,7 +36,7 @@
       in
       {
         packages.default = pkgs.rustPlatform.buildRustPackage {
-          pname = "booker-search";
+          pname = "rummage";
           version = "0.1.0";
 
           src = ./.;
@@ -51,15 +51,15 @@
           PKG_CONFIG_PATH = pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig" buildInputs;
 
           postInstall = ''
-            install -Dm644 man/bs.1 $out/share/man/man1/bs.1
+            install -Dm644 man/rum.1 $out/share/man/man1/rum.1
           '';
 
           meta = with pkgs.lib; {
             description = "Fuzzy file finder TUI with SSH support";
-            homepage = "https://github.com/user/booker-search";
+            homepage = "https://github.com/ryanbooker1/rummage";
             license = licenses.mit;
             maintainers = [];
-            mainProgram = "bs";
+            mainProgram = "rum";
           };
         };
 

@@ -125,7 +125,7 @@ impl Config {
 pub fn config_dir() -> PathBuf {
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("~/.config"))
-        .join("booker-search")
+        .join("rummage")
 }
 
 pub fn config_path() -> PathBuf {
@@ -143,7 +143,7 @@ pub fn credentials_plain_path() -> PathBuf {
 pub fn data_dir() -> PathBuf {
     dirs::data_local_dir()
         .unwrap_or_else(|| PathBuf::from("~/.local/share"))
-        .join("booker-search")
+        .join("rummage")
 }
 
 pub fn db_path() -> PathBuf {

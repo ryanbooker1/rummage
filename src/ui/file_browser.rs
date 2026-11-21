@@ -125,11 +125,11 @@ fn render_header(f: &mut Frame, area: Rect, app: &App) {
     let dim = Style::default().fg(FG4).bg(BG);
     let sep = Style::default().fg(BG4).bg(BG);
 
-    // Row 0: ╭─ booker-search ─...─╮
-    let title_prefix_w = 17usize; // "╭─ booker-search " = 17 chars
+    // Row 0: ╭─ rummage ─...─╮
+    let title_prefix_w = 12usize; // "╭─ rummage " = 12 chars (3 + 7 + 1 + 1)
     let top_line = Line::from(vec![
         Span::styled("╭─ ",          Theme::primary()),
-        Span::styled("booker-search", Style::default().fg(AQUA).add_modifier(Modifier::BOLD)),
+        Span::styled("rummage", Style::default().fg(AQUA).add_modifier(Modifier::BOLD)),
         Span::styled(format!(" {}╮", "─".repeat(w.saturating_sub(title_prefix_w + 1))),
                      Theme::primary()),
     ]);

@@ -185,7 +185,7 @@ pub fn search_names_ssh_async(
             use std::io::Write;
             use std::os::unix::fs::OpenOptionsExt;
             if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true)
-                .mode(0o600).open("/tmp/bs-ssh-search.log") {
+                .mode(0o600).open("/tmp/rum-ssh-search.log") {
                 let _ = writeln!(f, "{}", msg);
             }
         }

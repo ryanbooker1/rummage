@@ -1,10 +1,10 @@
 /// Single man-page style help document shown in the Help tab.
 /// Up/Down scrolls, Enter opens in the configured editor.
 pub const CONTENT: &str = "\
-BOOKER-SEARCH(1)                 User Manual                BOOKER-SEARCH(1)
+RUMMAGE(1)                       User Manual                       RUMMAGE(1)
 
 NAME
-    booker-search (bs) — fuzzy file finder with SSH support
+    rummage (rum) — fuzzy file finder with SSH support
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -173,7 +173,7 @@ SETTINGS GUIDE
 LOCATIONS
 ─────────
 
-  Each location is a directory that booker-search indexes and searches.
+  Each location is a directory that rummage indexes and searches.
   Local locations are walked on disk. SSH locations connect over SSH.
   Disable a location (Space in Locations tab) to exclude it from results
   without deleting its configuration.
@@ -181,7 +181,7 @@ LOCATIONS
   After adding or editing a location, press ^R to rebuild the index.
 
   SSH Locations
-    booker-search tries authentication in this order:
+    rummage tries authentication in this order:
       1. SSH agent (uses existing key if loaded)
       2. Password authentication
       3. Keyboard-interactive authentication
@@ -190,7 +190,7 @@ LOCATIONS
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-booker-search                                                     bs(1)
+rummage                                                          rum(1)
 ";
 
 /// Return the manual content as visual rows at the given display width.

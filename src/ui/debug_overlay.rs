@@ -125,7 +125,7 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
     // Misc
     let dbg_level = debug::level();
     let log_path = if dbg_level > 0 {
-        "/tmp/booker-search-debug.log".to_string()
+        "/tmp/rummage-debug.log".to_string()
     } else {
         "(disabled — set debug_level in config)".to_string()
     };

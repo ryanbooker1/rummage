@@ -9,9 +9,9 @@ use crate::config::Config;
 use crate::search;
 
 #[derive(Parser, Debug)]
-#[command(name = "bs")]
+#[command(name = "rum")]
 #[command(about = "Fuzzy file finder with SSH support")]
-#[command(long_about = "bs — fuzzy file finder with SSH support.\n\nRun without arguments to open the interactive TUI.\nProvide a QUERY to search non-interactively and print matching paths to stdout.")]
+#[command(long_about = "rum — fuzzy file finder with SSH support.\n\nRun without arguments to open the interactive TUI.\nProvide a QUERY to search non-interactively and print matching paths to stdout.")]
 #[command(version)]
 pub struct Cli {
     /// Search query (omit to open the interactive TUI)

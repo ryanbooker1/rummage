@@ -58,7 +58,7 @@ fn check_host_key(session: &Session, host: &str, port: u16) -> Result<()> {
 
     let known_hosts_path = dirs::config_dir()
         .unwrap_or_else(|| std::path::PathBuf::from(".config"))
-        .join("booker-search")
+        .join("rummage")
         .join("known_hosts");
 
     let mut known_hosts = session.known_hosts().context("Failed to initialise known_hosts")?;
@@ -80,7 +80,7 @@ fn check_host_key(session: &Session, host: &str, port: u16) -> Result<()> {
         CheckResult::NotFound => {
             // Trust-on-first-use: store the key and proceed.
             known_hosts
-                .add(&host_entry, key, "booker-search", fmt)
+                .add(&host_entry, key, "rummage", fmt)
                 .context("Failed to add host key to known_hosts")?;
             if let Some(parent) = known_hosts_path.parent() {
                 std::fs::create_dir_all(parent)?;
@@ -232,7 +232,7 @@ impl SshClient {
                                     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
                                     std::path::PathBuf::from(home).join(".local/share")
                                 });
-                            let dir = base.join("booker-search");
+                            let dir = base.join("rummage");
                             let _ = std::fs::create_dir_all(&dir);
                             dir.join("ssh-exec.log")
                         };

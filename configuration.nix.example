@@ -1,11 +1,11 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# Installing booker-search on NixOS (traditional configuration, no flakes)
+# Installing rummage on NixOS (traditional configuration, no flakes)
 # ──────────────────────────────────────────────────────────────────────────────
 #
 # Step 1: Get the sha256 hash for the version you want to pin.
 #
 #   nix-prefetch-url --unpack \
-#     https://github.com/ryanbooker1/booker-search/archive/main.tar.gz
+#     https://github.com/ryanbooker1/rummage/archive/main.tar.gz
 #
 #   Replace "main" with a specific commit hash or tag for a reproducible build.
 #   Update the sha256 value below with the output of that command.
@@ -20,13 +20,13 @@
 { config, pkgs, ... }:
 
 let
-  booker-search = pkgs.rustPlatform.buildRustPackage {
-    pname = "booker-search";
+  rummage = pkgs.rustPlatform.buildRustPackage {
+    pname = "rummage";
     version = "0.1.0";
 
     src = pkgs.fetchFromGitHub {
       owner  = "ryanbooker1";          # ← replace with your GitHub username
-      repo   = "booker-search";
+      repo   = "rummage";
       rev    = "main";              # ← pin to a commit hash for reproducibility
                                     #   e.g. "a1b2c3d4e5f6..."
       sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
@@ -44,20 +44,20 @@ let
       (with pkgs; [ openssl libssh2 zlib ]);
 
     postInstall = ''
-      install -Dm644 man/bs.1 $out/share/man/man1/bs.1
+      install -Dm644 man/rum.1 $out/share/man/man1/rum.1
     '';
 
     meta = with pkgs.lib; {
       description = "Fuzzy file finder TUI with SSH support";
-      homepage    = "https://github.com/ryanbooker1/booker-search";
+      homepage    = "https://github.com/ryanbooker1/rummage";
       license     = licenses.mit;
-      mainProgram = "bs";
+      mainProgram = "rum";
     };
   };
 in
 {
   environment.systemPackages = with pkgs; [
-    booker-search
+    rummage
 
     # Recommended: editor support (bs opens files in nvim by default)
     # neovim
@@ -75,7 +75,7 @@ in
 #
 # 1. Get the new hash:
 #      nix-prefetch-url --unpack \
-#        https://github.com/ryanbooker1/booker-search/archive/NEW_COMMIT.tar.gz
+#        https://github.com/ryanbooker1/rummage/archive/NEW_COMMIT.tar.gz
 #
 # 2. Update `rev` and `sha256` above.
 #
@@ -91,11 +91,11 @@ in
 #   curl --proto '=https' --tlsv1.2 -sSf \
 #     https://install.determinate.systems/nix | sh -s -- install
 #
-#   # Then install booker-search:
-#   nix profile install github:ryanbooker1/booker-search
+#   # Then install rummage:
+#   nix profile install github:ryanbooker1/rummage
 #
 #   # To update later:
-#   nix profile upgrade booker-search
+#   nix profile upgrade rummage
 #
 #
 # Option B — Build with Cargo (requires Rust + system dependencies):
@@ -107,9 +107,9 @@ in
 #   sudo pacman -S pkg-config openssl libssh2
 #
 #   # Then install:
-#   cargo install --git https://github.com/ryanbooker1/booker-search --bin bs
+#   cargo install --git https://github.com/ryanbooker1/rummage --bin rum
 #
 #   # To update:
-#   cargo install --git https://github.com/ryanbooker1/booker-search --bin bs --force
+#   cargo install --git https://github.com/ryanbooker1/rummage --bin rum --force
 #
 # ──────────────────────────────────────────────────────────────────────────────

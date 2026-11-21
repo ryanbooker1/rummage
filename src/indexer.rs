@@ -28,7 +28,7 @@ fn log_err(msg: &str) {
     use std::os::unix::fs::OpenOptionsExt;
     if let Ok(mut f) = std::fs::OpenOptions::new()
         .create(true).append(true)
-        .mode(0o600).open("/tmp/booker-search-index.log")
+        .mode(0o600).open("/tmp/rummage-index.log")
     {
         let ts = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)

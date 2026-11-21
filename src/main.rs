@@ -54,7 +54,7 @@ async fn main() -> Result<()> {
     // Load config
     let mut config = Config::load().context("Failed to load config")?;
     debug::set_level(config.settings.debug_level);
-    debug::log(2, "booker-search starting");
+    debug::log(2, "rummage starting");
 
     // Open / create DB
     let db_file = db_path();
@@ -3580,7 +3580,7 @@ fn open_ssh_file(
     // SSH_ASKPASS_REQUIRE=force tells OpenSSH ≥8.4 to always use it, even on a tty.
     let askpass_path: Option<String> = if let Some(ref pw) = password {
         use std::os::unix::fs::OpenOptionsExt;
-        let path = format!("/tmp/bs-askpass-{}", std::process::id());
+        let path = format!("/tmp/rum-askpass-{}", std::process::id());
         let result: std::io::Result<()> = (|| {
             // create_new + mode 0o700 is atomic — no race window between create and chmod.
             let mut f = std::fs::OpenOptions::new()
