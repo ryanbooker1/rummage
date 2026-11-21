@@ -7,7 +7,7 @@ use ratatui::{
 };
 use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
-use crate::app::{App, MatchType, SearchMode, SearchTarget, StatusLevel};
+use crate::app::{App, MatchType, SearchMode, SearchTarget};
 use crate::ui::theme::{Theme, BG, BG1, BG4, FG, FG4, YELLOW, PURPLE, AQUA, ORANGE};
 use crate::ui::config_view;
 
@@ -397,15 +397,7 @@ fn render_status_bar(f: &mut Frame, area: Rect, app: &App) {
         if next_row >= inner.height { return; }
         let line_area = Rect::new(inner.x, inner.y + next_row, inner.width, 1);
 
-        if let Some((msg, level)) = &app.status_msg {
-            let style = match level {
-                StatusLevel::Info    => Theme::primary(),
-                StatusLevel::Success => Theme::success(),
-                StatusLevel::Warning => Theme::warning(),
-                StatusLevel::Error   => Theme::error(),
-            };
-            f.render_widget(Paragraph::new(Span::styled(format!(" {}", msg), style)), line_area);
-        } else {
+        {
             let mut results_per_loc: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
             for r in &app.results {
                 *results_per_loc.entry(r.file.location_id.clone()).or_insert(0) += 1;
