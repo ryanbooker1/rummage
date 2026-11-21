@@ -36,19 +36,6 @@ impl InputField {
         }
     }
 
-    pub fn from_index(i: usize) -> Self {
-        match i {
-            0 => InputField::Name,
-            1 => InputField::Type,
-            2 => InputField::Path,
-            3 => InputField::SshHost,
-            4 => InputField::SshPort,
-            5 => InputField::SshUser,
-            6 => InputField::SshPassword,
-            _ => InputField::Name,
-        }
-    }
-
     pub fn label(&self) -> &str {
         match self {
             InputField::Name => "Name",
