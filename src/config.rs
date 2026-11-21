@@ -73,7 +73,7 @@ impl Default for Settings {
             consecutive_search: false,
             case_sensitive_search: false,
             content_search: false,
-            search_target: String::new(),
+            search_target: "all".to_string(),
             editor: default_editor(),
             search_mode: default_search_mode(),
             status_bar_expanded: false,
