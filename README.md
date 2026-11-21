@@ -267,16 +267,16 @@ rum -0 '*.rs' | xargs -0 wc -l  # NUL-separated output for xargs
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
-| `--target` | `-t` | `all` | What to search: `files`, `dirs`, `all`, `content` |
+| `--target` | `-t` | `files` | What to search: `files`, `dirs`, `all`, `content` |
 | `--mode` | `-m` | `both` | Search mode: `index`, `live`, `both` |
 | `--content` | `-f` | off | Also grep file contents |
 | `--case-sensitive` | `-c` | off | Case-sensitive matching |
-| `--fuzzy` | `-z` | on | Fuzzy matching (disable for consecutive/ordered) |
+| `--consecutive` | `-z` | off | Letters must appear in order, no gaps |
 | `--location` | `-l` | all | Filter to one location by name or ID |
-| `--limit` | `-n` | unlimited | Maximum results to print |
+| `--limit` | `-n` | `100` | Maximum results to print |
 | `--null` | `-0` | off | NUL-separated output (for `xargs -0`) |
 
-CLI defaults inherit from your saved TUI settings.
+CLI flags use built-in defaults and do not read or modify your saved settings.
 
 ## Keyboard shortcuts
 
