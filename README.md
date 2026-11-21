@@ -20,6 +20,17 @@ browse the file tree — all from the terminal.
 
 ## Installation
 
+### Download binary (any Linux, x86_64)
+
+Grab the latest pre-built static binary from [Releases](https://github.com/ryanbooker1/rummage/releases/latest):
+
+```bash
+curl -L https://github.com/ryanbooker1/rummage/releases/latest/download/rum-x86_64-linux -o ~/.local/bin/rum
+chmod +x ~/.local/bin/rum
+```
+
+No dependencies required — the binary is statically linked.
+
 ### NixOS (flakes)
 
 Add rummage to your flake inputs and include it in your system packages:
@@ -129,10 +140,32 @@ Install Rust and dependencies:
 sudo pacman -S rust pkg-config openssl libssh2 zlib
 ```
 
+If this is the first time installing `rust` on a system that hasn't been fully
+updated recently, `llvm-libs` can be left out of sync (pacman won't always
+force the matching upgrade), and `rustc` fails with something like:
+
+```
+error while loading shared libraries: libLLVM.so.XX.Y: cannot open shared object file: No such file or directory
+```
+
+Fix this by updating first — `omarchy update` on Omarchy, or
+`sudo pacman -Syu` on plain Arch/Manjaro — then reinstalling `rust`:
+
+```bash
+sudo pacman -S rust
+```
+
 Install via Cargo:
 
 ```bash
 cargo install --git https://github.com/ryanbooker1/rummage --bin rum
+```
+
+Cargo installs binaries to `~/.cargo/bin`. If that directory isn't already on
+your `PATH`, add it (e.g. in `~/.bashrc` or `~/.zshrc`):
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
 ### Ubuntu / Debian

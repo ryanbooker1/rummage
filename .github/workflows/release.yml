@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux-x86_64:
+    name: Build static Linux binary (x86_64)
+    runs-on: ubuntu-latest
+    container:
+      image: rust:alpine
+    steps:
+      - name: Install system dependencies
+        run: |
+          apk add --no-cache \
+            musl-dev \
+            pkgconf \
+            openssl-dev \
+            openssl-libs-static \
+            libssh2-dev \
+            zlib-dev \
+            zlib-static \
+            git
+
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: cargo build --release --bin rum
+        env:
+          PKG_CONFIG_ALL_STATIC: "1"
+          RUSTFLAGS: "-C target-feature=+crt-static"
+
+      - name: Rename binary
+        run: cp target/release/rum rum-x86_64-linux
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: rum-x86_64-linux
+          generate_release_notes: true
