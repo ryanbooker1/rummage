@@ -258,21 +258,39 @@ async fn run_content_search(
         if printed >= limit { break; }
 
         if loc.kind == "local" {
-            let mut args: Vec<&str> = vec!["-rn"];
-            if !case_sensitive { args.push("-i"); }
-            args.extend_from_slice(&["--", query, &loc.path]);
-            if let Ok(out) = std::process::Command::new("grep").args(&args).output() {
-                for line in String::from_utf8_lossy(&out.stdout).lines() {
+            use std::io::{IsTerminal, Write};
+            let stderr_tty = std::io::stderr().is_terminal();
+            let query_lower = query.to_lowercase();
+            let walker = ignore::WalkBuilder::new(&loc.path)
+                .hidden(true)
+                .git_ignore(true)
+                .build();
+            for entry in walker.flatten() {
+                if printed >= limit { break; }
+                let path = entry.path();
+                if !path.is_file() { continue; }
+                let path_str = path.to_string_lossy().into_owned();
+                if stderr_tty {
+                    eprint!("\r\x1b[K  {}", path_str);
+                    let _ = std::io::stderr().flush();
+                }
+                let Ok(content) = std::fs::read_to_string(path) else { continue };
+                for (i, line) in content.lines().enumerate() {
                     if printed >= limit { break; }
-                    // grep format: path:lineno:text
-                    let mut parts = line.splitn(3, ':');
-                    if let (Some(path), Some(ln), Some(text)) =
-                        (parts.next(), parts.next(), parts.next())
-                    {
-                        print!("{}:{}:{}{}", path, ln, text, sep);
+                    let matched = if case_sensitive {
+                        line.contains(query)
+                    } else {
+                        line.to_lowercase().contains(&query_lower)
+                    };
+                    if matched {
+                        print!("{}:{}:{}{}", path_str, i + 1, line, sep);
                         printed += 1;
                     }
                 }
+            }
+            if stderr_tty {
+                eprint!("\r\x1b[K");
+                let _ = std::io::stderr().flush();
             }
         } else if loc.kind == "ssh" {
             if let Some(password) = credentials.get(&loc.id) {
