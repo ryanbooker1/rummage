@@ -198,9 +198,9 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
         vec![
             InputField::Name,
             InputField::Type,
-            InputField::Path,
             InputField::SshHost,
             InputField::SshPort,
+            InputField::Path,
             InputField::SshUser,
             InputField::SshPassword,
         ]
