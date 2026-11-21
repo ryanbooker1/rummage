@@ -114,11 +114,12 @@ fn render_logo(f: &mut Frame, area: Rect, app: &App) {
     let total = app.results.len();
 
     // ── Row 0: ╭─ rummage ─...─╮ ──────────────────────────────────
-    let title_prefix_w = 12usize; // "╭─ rummage " = 12 chars (3 + 7 + 1 + 1)
+    // span1("╭─ "=3) + span2("rummage"=7) + span3(" " + dashes + "╮") = w
+    // → dashes = w - 3 - 7 - 2 = w - 12
     let top_line = Line::from(vec![
         Span::styled("╭─ ",          Theme::primary()),
         Span::styled("rummage", Style::default().fg(AQUA).add_modifier(Modifier::BOLD)),
-        Span::styled(format!(" {}╮", "─".repeat(w.saturating_sub(title_prefix_w + 1))),
+        Span::styled(format!(" {}╮", "─".repeat(w.saturating_sub(12))),
                      Theme::primary()),
     ]);
     f.render_widget(
