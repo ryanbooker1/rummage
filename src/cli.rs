@@ -62,7 +62,7 @@ pub async fn run_cli(
     };
 
     if query.len() < 2 {
-        eprintln!("bs: query must be at least 2 characters");
+        eprintln!("rum: query must be at least 2 characters");
         std::process::exit(1);
     }
 
@@ -89,7 +89,7 @@ pub async fn run_cli(
 
     if let Some(ref wanted) = cli.location {
         if loc_filter.is_none() {
-            eprintln!("bs: location {:?} not found", wanted);
+            eprintln!("rum: location {:?} not found", wanted);
             std::process::exit(1);
         }
     }
@@ -229,6 +229,19 @@ async fn run_name_search(
                     progress_shown = true;
                 }
             }
+            Some(NameSearchMsg::IndexProgress { processed, total }) => {
+                if stderr_tty {
+                    use std::io::Write;
+                    if total > 0 {
+                        let pct = processed * 100 / total;
+                        eprint!("\r\x1b[K  searching index: {}/{} ({}%)", processed, total, pct);
+                    } else {
+                        eprint!("\r\x1b[K  searching index…");
+                    }
+                    let _ = std::io::stderr().flush();
+                    progress_shown = true;
+                }
+            }
             Some(_) => {}
             None => break,
         }
@@ -314,7 +327,7 @@ async fn run_content_search(
                         );
                     }
                     Err(e) => {
-                        eprintln!("bs: SSH connect failed for '{}': {}", loc.name, e);
+                        eprintln!("rum: SSH connect failed for '{}': {}", loc.name, e);
                     }
                 }
             }

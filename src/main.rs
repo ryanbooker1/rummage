@@ -48,6 +48,11 @@ use crypto::CredentialStore;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Restore default SIGPIPE handling so piping output to head/grep/etc. exits
+    // cleanly instead of panicking with "failed printing to stdout: Broken pipe".
+    #[cfg(unix)]
+    unsafe { libc::signal(libc::SIGPIPE, libc::SIG_DFL); }
+
     // Parse CLI args first so --help / --version / bad-args exit before any I/O.
     let cli_args = cli::Cli::parse();
 

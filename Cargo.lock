@@ -1279,6 +1279,7 @@ dependencies = [
  "dirs",
  "fuzzy-matcher",
  "ignore",
+ "libc",
  "rand",
  "ratatui",
  "rusqlite",
