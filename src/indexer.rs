@@ -189,7 +189,7 @@ fn rebuild_index_blocking(
             });
 
             let walker = ignore::WalkBuilder::new(root)
-                .hidden(false)
+                .hidden(true)
                 .git_ignore(true)
                 .filter_entry(|e| {
                     let name = e.file_name().to_string_lossy();

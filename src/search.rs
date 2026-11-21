@@ -103,7 +103,7 @@ pub fn search_names_live_async(
                 continue;
             }
             let walker = ignore::WalkBuilder::new(root)
-                .hidden(false)
+                .hidden(true)
                 .git_ignore(true)
                 .build();
             let mut walk_count = 0usize;
@@ -682,7 +682,7 @@ fn search_contents_blocking(
             });
 
             let walker = ignore::WalkBuilder::new(root)
-                .hidden(false)
+                .hidden(true)
                 .git_ignore(true)
                 .build();
 
