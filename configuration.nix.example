@@ -1,0 +1,115 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Installing booker-search on NixOS (traditional configuration, no flakes)
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# Step 1: Get the sha256 hash for the version you want to pin.
+#
+#   nix-prefetch-url --unpack \
+#     https://github.com/ryanbooker1/booker-search/archive/main.tar.gz
+#
+#   Replace "main" with a specific commit hash or tag for a reproducible build.
+#   Update the sha256 value below with the output of that command.
+#
+# Step 2: Add the package expression below to your /etc/nixos/configuration.nix
+#         (or a file imported by it).
+#
+# Step 3: Run: sudo nixos-rebuild switch
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
+{ config, pkgs, ... }:
+
+let
+  booker-search = pkgs.rustPlatform.buildRustPackage {
+    pname = "booker-search";
+    version = "0.1.0";
+
+    src = pkgs.fetchFromGitHub {
+      owner  = "ryanbooker1";          # ← replace with your GitHub username
+      repo   = "booker-search";
+      rev    = "main";              # ← pin to a commit hash for reproducibility
+                                    #   e.g. "a1b2c3d4e5f6..."
+      sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+                                    # ← replace with output of nix-prefetch-url
+    };
+
+    cargoLock = {
+      lockFile = ./Cargo.lock;      # nix reads this from the fetched source
+    };
+
+    nativeBuildInputs = with pkgs; [ pkg-config ];
+    buildInputs       = with pkgs; [ openssl libssh2 zlib ];
+
+    PKG_CONFIG_PATH = pkgs.lib.makeSearchPathOutput "dev" "lib/pkgconfig"
+      (with pkgs; [ openssl libssh2 zlib ]);
+
+    postInstall = ''
+      install -Dm644 man/bs.1 $out/share/man/man1/bs.1
+    '';
+
+    meta = with pkgs.lib; {
+      description = "Fuzzy file finder TUI with SSH support";
+      homepage    = "https://github.com/ryanbooker1/booker-search";
+      license     = licenses.mit;
+      mainProgram = "bs";
+    };
+  };
+in
+{
+  environment.systemPackages = with pkgs; [
+    booker-search
+
+    # Recommended: editor support (bs opens files in nvim by default)
+    # neovim
+
+    # Optional: clipboard support when copying paths from the file browser
+    # xclip   # X11
+    # wl-clipboard  # Wayland
+  ];
+}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Updating to a new version
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# 1. Get the new hash:
+#      nix-prefetch-url --unpack \
+#        https://github.com/ryanbooker1/booker-search/archive/NEW_COMMIT.tar.gz
+#
+# 2. Update `rev` and `sha256` above.
+#
+# 3. Run: sudo nixos-rebuild switch
+#
+# ──────────────────────────────────────────────────────────────────────────────
+# Installing on non-NixOS Linux (Arch, Ubuntu, Manjaro, Omarchy, etc.)
+# ──────────────────────────────────────────────────────────────────────────────
+#
+# Option A — Install Nix on any Linux, then use this package:
+#
+#   # Install the Nix package manager (Determinate installer):
+#   curl --proto '=https' --tlsv1.2 -sSf \
+#     https://install.determinate.systems/nix | sh -s -- install
+#
+#   # Then install booker-search:
+#   nix profile install github:ryanbooker1/booker-search
+#
+#   # To update later:
+#   nix profile upgrade booker-search
+#
+#
+# Option B — Build with Cargo (requires Rust + system dependencies):
+#
+#   # Ubuntu / Debian:
+#   sudo apt install pkg-config libssl-dev libssh2-1-dev
+#
+#   # Arch / Manjaro / Omarchy:
+#   sudo pacman -S pkg-config openssl libssh2
+#
+#   # Then install:
+#   cargo install --git https://github.com/ryanbooker1/booker-search --bin bs
+#
+#   # To update:
+#   cargo install --git https://github.com/ryanbooker1/booker-search --bin bs --force
+#
+# ──────────────────────────────────────────────────────────────────────────────

@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Gruvbox Dark</string>
+	<key>settings</key>
+	<array>
+		<!-- Global defaults -->
+		<dict>
+			<key>settings</key>
+			<dict>
+				<key>background</key>
+				<string>#282828</string>
+				<key>foreground</key>
+				<string>#ebdbb2</string>
+				<key>caret</key>
+				<string>#ebdbb2</string>
+				<key>selection</key>
+				<string>#504945</string>
+				<key>selectionBorder</key>
+				<string>#665c54</string>
+				<key>lineHighlight</key>
+				<string>#3c3836</string>
+			</dict>
+		</dict>
+
+		<!-- Comments -->
+		<dict>
+			<key>name</key>
+			<string>Comment</string>
+			<key>scope</key>
+			<string>comment, punctuation.definition.comment</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#928374</string>
+			</dict>
+		</dict>
+
+		<!-- Strings -->
+		<dict>
+			<key>name</key>
+			<string>String</string>
+			<key>scope</key>
+			<string>string, string.quoted, string.unquoted, string.interpolated, string.regexp</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#b8bb26</string>
+			</dict>
+		</dict>
+
+		<!-- String escape sequences -->
+		<dict>
+			<key>name</key>
+			<string>String Escape</string>
+			<key>scope</key>
+			<string>constant.character.escape, string.escaped</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#8ec07c</string>
+			</dict>
+		</dict>
+
+		<!-- Numbers -->
+		<dict>
+			<key>name</key>
+			<string>Number</string>
+			<key>scope</key>
+			<string>constant.numeric</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#d3869b</string>
+			</dict>
+		</dict>
+
+		<!-- Language constants (true, false, nil, null, None) -->
+		<dict>
+			<key>name</key>
+			<string>Built-in Constant</string>
+			<key>scope</key>
+			<string>constant.language</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#d3869b</string>
+			</dict>
+		</dict>
+
+		<!-- Other constants -->
+		<dict>
+			<key>name</key>
+			<string>Other Constant</string>
+			<key>scope</key>
+			<string>constant.other, constant.character</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#d3869b</string>
+			</dict>
+		</dict>
+
+		<!-- Keywords -->
+		<dict>
+			<key>name</key>
+			<string>Keyword</string>
+			<key>scope</key>
+			<string>keyword, keyword.control, keyword.operator.word</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fb4934</string>
+			</dict>
+		</dict>
+
+		<!-- Operators -->
+		<dict>
+			<key>name</key>
+			<string>Operator</string>
+			<key>scope</key>
+			<string>keyword.operator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fe8019</string>
+			</dict>
+		</dict>
+
+		<!-- Storage keywords (fn, let, var, const, def, class, ...) -->
+		<dict>
+			<key>name</key>
+			<string>Storage</string>
+			<key>scope</key>
+			<string>storage, storage.type.function, storage.modifier</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fb4934</string>
+			</dict>
+		</dict>
+
+		<!-- Storage type names (int, float, bool, String, ...) -->
+		<dict>
+			<key>name</key>
+			<string>Storage Type</string>
+			<key>scope</key>
+			<string>storage.type</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fabd2f</string>
+			</dict>
+		</dict>
+
+		<!-- Entity: function names -->
+		<dict>
+			<key>name</key>
+			<string>Function Name</string>
+			<key>scope</key>
+			<string>entity.name.function, meta.function entity.name</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#b8bb26</string>
+			</dict>
+		</dict>
+
+		<!-- Entity: type/class names -->
+		<dict>
+			<key>name</key>
+			<string>Type Name</string>
+			<key>scope</key>
+			<string>entity.name.type, entity.name.class, entity.name.struct, entity.name.enum, entity.name.trait</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fabd2f</string>
+			</dict>
+		</dict>
+
+		<!-- Entity: tags (HTML/XML) -->
+		<dict>
+			<key>name</key>
+			<string>Tag Name</string>
+			<key>scope</key>
+			<string>entity.name.tag</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fb4934</string>
+			</dict>
+		</dict>
+
+		<!-- Entity: attribute names -->
+		<dict>
+			<key>name</key>
+			<string>Attribute Name</string>
+			<key>scope</key>
+			<string>entity.other.attribute-name</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fabd2f</string>
+			</dict>
+		</dict>
+
+		<!-- Support: functions (built-ins) -->
+		<dict>
+			<key>name</key>
+			<string>Support Function</string>
+			<key>scope</key>
+			<string>support.function</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#8ec07c</string>
+			</dict>
+		</dict>
+
+		<!-- Support: class names -->
+		<dict>
+			<key>name</key>
+			<string>Support Class</string>
+			<key>scope</key>
+			<string>support.class, support.type</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fabd2f</string>
+			</dict>
+		</dict>
+
+		<!-- Support: constants -->
+		<dict>
+			<key>name</key>
+			<string>Support Constant</string>
+			<key>scope</key>
+			<string>support.constant</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fe8019</string>
+			</dict>
+		</dict>
+
+		<!-- Variables -->
+		<dict>
+			<key>name</key>
+			<string>Variable</string>
+			<key>scope</key>
+			<string>variable, variable.other</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ebdbb2</string>
+			</dict>
+		</dict>
+
+		<!-- Special variables (self, this, super) -->
+		<dict>
+			<key>name</key>
+			<string>Special Variable</string>
+			<key>scope</key>
+			<string>variable.language</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fe8019</string>
+			</dict>
+		</dict>
+
+		<!-- Parameters -->
+		<dict>
+			<key>name</key>
+			<string>Parameter</string>
+			<key>scope</key>
+			<string>variable.parameter</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#83a598</string>
+			</dict>
+		</dict>
+
+		<!-- Macros / preprocessor -->
+		<dict>
+			<key>name</key>
+			<string>Macro</string>
+			<key>scope</key>
+			<string>meta.preprocessor, keyword.other.special-method, meta.macro, support.function.macro, entity.name.function.macro</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#8ec07c</string>
+			</dict>
+		</dict>
+
+		<!-- Attributes / annotations (Rust #[...], Java @...) -->
+		<dict>
+			<key>name</key>
+			<string>Attribute / Annotation</string>
+			<key>scope</key>
+			<string>meta.attribute, punctuation.definition.attribute, variable.annotation</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fabd2f</string>
+			</dict>
+		</dict>
+
+		<!-- Punctuation -->
+		<dict>
+			<key>name</key>
+			<string>Punctuation</string>
+			<key>scope</key>
+			<string>punctuation, punctuation.definition, punctuation.separator, punctuation.terminator</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#ebdbb2</string>
+			</dict>
+		</dict>
+
+		<!-- Invalid / deprecated -->
+		<dict>
+			<key>name</key>
+			<string>Invalid</string>
+			<key>scope</key>
+			<string>invalid, invalid.illegal</string>
+			<key>settings</key>
+			<dict>
+				<key>foreground</key>
+				<string>#fb4934</string>
+				<key>background</key>
+				<string>#3c3836</string>
+			</dict>
+		</dict>
+
+	</array>
+	<key>uuid</key>
+	<string>7f7b8e3a-2c4d-4f5a-9b6c-1d2e3f4a5b6c</string>
+</dict>
+</plist>

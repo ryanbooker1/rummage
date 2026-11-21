@@ -1,0 +1,32 @@
+%YAML 1.2
+---
+name: CSV
+file_extensions:
+  - csv
+  - tsv
+scope: source.csv
+
+contexts:
+  main:
+    - include: quoted-field
+    - include: number
+    - include: separator
+
+  quoted-field:
+    - match: '"'
+      scope: punctuation.definition.string.begin.csv
+      push:
+        - meta_scope: string.quoted.double.csv
+        - match: '""'
+          scope: constant.character.escape.csv
+        - match: '"'
+          scope: punctuation.definition.string.end.csv
+          pop: true
+
+  number:
+    - match: '(?<![^\,\n])-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?(?=[\,\n\r]|$)'
+      scope: constant.numeric.csv
+
+  separator:
+    - match: '[,\t]'
+      scope: punctuation.separator.csv

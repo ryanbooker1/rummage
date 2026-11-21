@@ -1,0 +1,370 @@
+.TH BS 1 "November 2026" "booker-search 0.1.0" "User Commands"
+.SH NAME
+bs \- fuzzy file finder with SSH support
+.SH SYNOPSIS
+.B bs
+.RI [ OPTIONS ]
+.RI [ QUERY ]
+.SH DESCRIPTION
+.B bs
+is a fuzzy file finder with an interactive TUI and SSH support.
+When invoked without arguments it opens the interactive interface.
+When a
+.I QUERY
+argument is supplied it runs the search non\-interactively and prints
+matching paths to standard output, one per line.
+.PP
+Search results use the on-disk index by default; live filesystem scans
+are added in
+.B both
+mode (the default).
+SSH locations are searched transparently.
+.SH OPTIONS
+.TP
+.I QUERY
+Search query to run non\-interactively.
+Must be at least 2 characters.
+Omit to open the interactive TUI.
+.TP
+.BR \-t ", " \-\-target " <TARGET>"
+What to search.
+One of:
+.B files
+(default),
+.BR dirs ,
+.BR all ,
+.BR content .
+.TP
+.BR \-m ", " \-\-mode " <MODE>"
+Search mode.
+One of:
+.B both
+(default),
+.BR index ,
+.BR live .
+\fBindex\fR queries the on-disk database only (fast, may be stale).
+\fBlive\fR walks the filesystem / SSH host live (slower, always current).
+\fBboth\fR runs index first then live to fill in new files.
+.TP
+.BR \-f ", " \-\-content
+Also search inside file contents (grep).
+Results are printed as
+\fIpath\fR:\fIline\fR:\fItext\fR.
+.TP
+.BR \-c ", " \-\-case\-sensitive
+Case\-sensitive matching.
+Default is case\-insensitive.
+.TP
+.BR \-z ", " \-\-consecutive
+Consecutive matching: query characters must appear in the filename in
+order with no gaps.
+Default is standard fuzzy matching (characters may skip positions).
+.TP
+.BR \-l ", " \-\-location " <LOCATION>"
+Restrict results to a single location, matched by name or ID
+(case\-insensitive name match).
+.TP
+.BR \-n ", " \-\-limit " <N>"
+Maximum number of results to print.
+Default is 100.
+.TP
+.BR \-0 ", " \-\-null
+Separate output paths with NUL bytes instead of newlines.
+Useful with
+.BR xargs (1)
+.BR \-0 .
+.TP
+.BR \-h ", " \-\-help
+Print a brief help message and exit.
+.TP
+.BR \-V ", " \-\-version
+Print the version number and exit.
+.SH INTERACTIVE MODE
+When run without a
+.I QUERY
+argument,
+.B bs
+opens a full\-screen interactive TUI.
+The index is searched as you type; live searches start after a short debounce.
+.SS Navigation
+.TP
+.BR "Up / Down"
+Move cursor through results.
+.TP
+.BR "PgUp / PgDn"
+Jump by one page.
+.TP
+.B Enter
+Open the selected file in the configured editor.
+.TP
+.B Esc
+Clear the query and cancel all running searches.
+.SS Search Toggles
+.TP
+.B ^F
+Toggle content search on/off (grep inside file contents).
+.TP
+.B ^T
+Cycle search target: files \(-> dirs \(-> all \(-> content.
+Filters in\-place when possible; restarts search only when necessary.
+.TP
+.B ^S
+Cycle search mode: index \(-> live \(-> both.
+.TP
+.B ^Z
+Toggle fuzzy / consecutive matching.
+.TP
+.B ^A
+Toggle case\-sensitive matching.
+.TP
+.B ^L
+Cycle location filter: all \(-> location[0] \(-> location[1] \(-> \&.\|.\|.
+Smart behaviour: filters in\-place when the target location has already
+finished searching; keeps the target\(aqs task running and cancels others
+when it is still in progress; restarts only the target when it has not
+been searched yet.
+.SS Results
+.TP
+.B ^N
+Show file / directory info popup for the selected result.
+.TP
+.B "^C  /  Right"
+Open the file browser at the selected result.
+.SS Index
+.TP
+.B ^R
+Rebuild the search index from all configured locations.
+.SS Status / Controls Bars
+.TP
+.B ^V
+Expand / collapse the status bar.
+.TP
+.B ^H
+Show / hide the status bar.
+.TP
+.B ^K
+Show / hide the controls bar.
+.SS Application
+.TP
+.B Tab
+Open the settings / menu popup.
+.TP
+.B ^Q
+Quit.
+.SS Settings Popup
+.TP
+.BR "Left / Right"
+Switch tab (Settings \(bu Locations \(bu Keys \(bu Manual).
+.TP
+.BR "Up / Down"
+Navigate items / scroll the manual.
+.TP
+.BR "Enter / Space"
+Toggle a setting or activate an item.
+.TP
+.BR "Tab / Esc"
+Close the popup.
+.SS Locations Tab
+.TP
+.B a
+Add a new location.
+.TP
+.BR "e / Enter"
+Edit the selected location.
+.TP
+.B d
+Delete the selected location.
+.TP
+.B Space
+Toggle location enabled / disabled.
+.TP
+.B ^Z
+Test the SSH connection (in the edit form).
+.SH WILDCARD SEARCH
+Type
+.B *
+or
+.B ?
+anywhere in your query to switch into glob mode.
+Wildcards are detected automatically; no mode toggle is needed.
+.TP
+.B *
+Matches any sequence of characters (including none).
+.TP
+.B ?
+Matches exactly one character.
+.PP
+If the pattern contains no
+.BR / ,
+it matches against the filename only.
+If the pattern contains
+.BR / ,
+it matches against the full path.
+Case sensitivity follows the
+.B ^A
+setting (interactive) or
+.B \-\-case\-sensitive
+flag (CLI).
+.PP
+Examples:
+.IP
+.nf
+\fB*.rs\fR            All Rust source files
+\fBtest_*\fR          Files beginning with \(lqtest_\(rq
+\fBREADME*\fR         README, README.md, README.txt, etc.
+\fBsrc/*/main.rs\fR   main.rs one level deep under src/
+\fBsrc/**/*_test.rs\fR  any _test.rs under src/ at any depth
+.fi
+.PP
+Wildcard mode replaces fuzzy/consecutive matching entirely.
+The
+.B [wildcard]
+badge appears in the search bar when active.
+Combine with content search
+.RB ( \-f " / " ^F )
+to grep inside matched files.
+.SH SEARCH RESULTS
+Results are shown in four columns in the interactive TUI:
+.TP
+.B Location
+The configured location name the file belongs to.
+.TP
+.B Match
+Match type and source:
+.RS
+.TP
+.B "[filename] I"
+Filename match from the on\-disk index.
+.TP
+.B "[filename] S"
+Filename match from a live scan.
+.TP
+.B "[directory] I"
+Directory from the index.
+.TP
+.B "[content] S"
+Content (grep) match, always live.
+.RE
+.TP
+.B Path
+The file or directory path.
+.TP
+.B Preview
+Content matches show the matching line after a vertical bar.
+.SH SETTINGS
+.TP
+.B Content Search
+When on, searches inside file contents in addition to filenames.
+Uses grep locally and SSH grep on remote locations.
+Slower than name\-only search; best used with a specific query.
+.TP
+.B Search Target
+Determines what types of entries are returned:
+.BR files " (default), " dirs ", " all ", " content .
+.TP
+.B Fuzzy / Consecutive Matching
+When in consecutive mode, query letters must appear in sequence with no gaps.
+Example: \(lqsrc\(rq matches \(lqsource\(rq but not \(lqsearch\(rq.
+When off, standard fuzzy matching is used (letters may skip positions).
+Wildcard mode overrides both.
+.TP
+.B Case Sensitive
+When on, \(lqREADME\(rq does not match \(lqreadme\(rq.
+.TP
+.B Editor
+Selects which editor opens when you press Enter on a result.
+Supported: \fBnvim\fR (default), \fBnano\fR.
+.TP
+.B Require Unlock on Startup
+When on, SSH passwords are stored encrypted (AES\-256\-GCM) and require a
+master password each time the application starts.
+When off, SSH passwords are stored in a plain JSON file (permissions 600).
+.PP
+In CLI mode, only plain\-storage credentials and SSH agent authentication
+are available; there is no prompt for a master password.
+.SH LOCATIONS
+Each location is a directory that
+.B bs
+indexes and searches.
+Local locations are walked on disk.
+SSH locations connect over SSH.
+.PP
+Disable a location (Space in the Locations tab) to exclude it from results
+without deleting its configuration.
+After adding or editing a location, press
+.B ^R
+to rebuild the index.
+.PP
+SSH authentication is attempted in this order:
+.IP "1." 4
+SSH agent (uses an existing loaded key).
+.IP "2."
+Password authentication.
+.IP "3."
+Keyboard\-interactive authentication.
+.PP
+Use
+.B ^Z
+in the location edit form to test a connection before saving.
+SSH host keys are verified using trust\-on\-first\-use (TOFU) and stored in
+.IR ~/.config/booker\-search/known_hosts .
+A host\-key mismatch aborts the connection with a warning.
+.SH FILES
+.TP
+.I ~/.config/booker\-search/config.toml
+Main configuration file (locations, settings).
+.TP
+.I ~/.config/booker\-search/bs.db
+SQLite database used as the search index.
+.TP
+.I ~/.config/booker\-search/credentials.json
+SSH passwords in plain text (permissions 600).
+Used when
+.B Require Unlock on Startup
+is off.
+.TP
+.I ~/.config/booker\-search/credentials.enc
+SSH passwords encrypted with AES\-256\-GCM and an Argon2\-derived key.
+Used when
+.B Require Unlock on Startup
+is on.
+.TP
+.I ~/.config/booker\-search/known_hosts
+SSH host keys accepted by
+.B bs
+(OpenSSH format, permissions 600).
+.SH EXAMPLES
+.PP
+Open the interactive TUI:
+.IP
+.B bs
+.PP
+Find all Rust source files:
+.IP
+.B "bs '*.rs'"
+.PP
+Find files matching \(lqmain\(rq with a live scan:
+.IP
+.B "bs \-m live main"
+.PP
+Search file contents for \(lqTODO\(rq:
+.IP
+.B "bs \-f TODO"
+.PP
+Case\-sensitive search for \(lqConfig\(rq in directories only:
+.IP
+.B "bs \-c \-t dirs Config"
+.PP
+Search only the \(lqwork\(rq location and pipe to fzf:
+.IP
+.B "bs \-l work query | fzf"
+.PP
+Feed results to xargs (NUL\-separated):
+.IP
+.B "bs \-0 '*.toml' | xargs \-0 grep \-l dependencies"
+.SH SEE ALSO
+.BR find (1),
+.BR grep (1),
+.BR fzf (1),
+.BR ssh (1),
+.BR ssh\-add (1)

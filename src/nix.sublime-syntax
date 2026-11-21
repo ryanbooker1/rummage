@@ -1,0 +1,123 @@
+%YAML 1.2
+---
+name: Nix
+file_extensions:
+  - nix
+scope: source.nix
+
+contexts:
+  main:
+    - include: comments
+    - include: multiline-strings
+    - include: strings
+    - include: paths
+    - include: keywords
+    - include: constants
+    - include: builtins
+    - include: numbers
+    - include: operators
+    - include: punctuation
+
+  comments:
+    - match: '#[^\n]*'
+      scope: comment.line.nix
+    - match: '/\*'
+      push: block-comment
+
+  block-comment:
+    - meta_scope: comment.block.nix
+    - match: '\*/'
+      pop: true
+    - match: '[^*]+'
+      scope: comment.block.nix
+    - match: '\*(?!/)'
+      scope: comment.block.nix
+
+  multiline-strings:
+    - match: "''"
+      scope: string.quoted.other.nix
+      push: multiline-string-body
+
+  multiline-string-body:
+    - meta_scope: string.quoted.other.nix
+    - match: "''"
+      scope: string.quoted.other.nix
+      pop: true
+    - match: "''\\\\|''\\$"
+      scope: constant.character.escape.nix
+    - match: '\$\{'
+      scope: punctuation.section.interpolation.nix
+      push: interpolation
+
+  strings:
+    - match: '"'
+      scope: string.quoted.double.nix
+      push: string-body
+
+  string-body:
+    - meta_scope: string.quoted.double.nix
+    - match: '"'
+      scope: string.quoted.double.nix
+      pop: true
+    - match: '\\[nrt"\\$]'
+      scope: constant.character.escape.nix
+    - match: '\$\{'
+      scope: punctuation.section.interpolation.nix
+      push: interpolation
+
+  interpolation:
+    - meta_scope: meta.interpolation.nix
+    - match: '\}'
+      scope: punctuation.section.interpolation.nix
+      pop: true
+    - include: main
+
+  paths:
+    - match: '<[a-zA-Z0-9._-]+(/[a-zA-Z0-9._-]+)*>'
+      scope: string.unquoted.path.angle.nix
+    - match: '(~|\.\.?)?(/[a-zA-Z0-9._+\-]+)+'
+      scope: string.unquoted.path.nix
+    - match: '\./[a-zA-Z0-9._+\-/]+'
+      scope: string.unquoted.path.nix
+
+  keywords:
+    - match: '\b(if|then|else|assert|with|let|in|rec|inherit)\b'
+      scope: keyword.control.nix
+
+  constants:
+    - match: '\b(true|false|null)\b'
+      scope: constant.language.nix
+
+  builtins:
+    - match: '\b(builtins)\b'
+      scope: support.class.nix
+    - match: '\b(abort|baseNameOf|derivation|dirOf|fetchTarball|import|isNull|map|removeAttrs|throw|toString|fetchurl|fetchgit)\b'
+      scope: support.function.nix
+    - match: '\b(mkDerivation|mkShell|mkOption|mkIf|mkMerge|mkDefault|mkForce|mkOverride)\b'
+      scope: support.function.nix
+    - match: '\b(stdenv|lib|pkgs|self|super|config|options|modulesPath)\b'
+      scope: support.variable.nix
+
+  numbers:
+    - match: '\b[0-9]+\b'
+      scope: constant.numeric.nix
+
+  operators:
+    - match: '(->|//|\+\+|&&|\|\||==|!=|<=|>=)'
+      scope: keyword.operator.nix
+    - match: '[!<>]'
+      scope: keyword.operator.nix
+    - match: '[@?]'
+      scope: keyword.operator.nix
+    - match: '='
+      scope: keyword.operator.assignment.nix
+    - match: ':'
+      scope: punctuation.separator.nix
+
+  punctuation:
+    - match: '[{}()\[\]]'
+      scope: punctuation.section.nix
+    - match: '[,;]'
+      scope: punctuation.separator.nix
+    - match: '\.'
+      scope: punctuation.accessor.nix

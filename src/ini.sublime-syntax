@@ -1,0 +1,32 @@
+%YAML 1.2
+---
+name: INI
+file_extensions:
+  - ini
+  - cfg
+  - conf
+  - editorconfig
+scope: source.ini
+
+contexts:
+  main:
+    - include: comments
+    - include: sections
+    - include: key-value
+
+  comments:
+    - match: '[;#][^\n]*'
+      scope: comment.line.ini
+
+  sections:
+    - match: '^\s*\[([^\]]*)\]'
+      scope: entity.name.section.ini
+      captures:
+        1: entity.name.type.ini
+
+  key-value:
+    - match: '^([^=:\[#;\n][^=:\n]*?)\s*([=:])\s*(.*)'
+      captures:
+        1: variable.other.ini
+        2: keyword.operator.ini
+        3: string.unquoted.ini
