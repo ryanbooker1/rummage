@@ -194,19 +194,7 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
     let inner = block.inner(modal_area);
     f.render_widget(block, modal_area);
 
-    let fields_to_show: Vec<InputField> = if app.form.is_ssh {
-        vec![
-            InputField::Name,
-            InputField::Type,
-            InputField::SshHost,
-            InputField::SshPort,
-            InputField::Path,
-            InputField::SshUser,
-            InputField::SshPassword,
-        ]
-    } else {
-        vec![InputField::Name, InputField::Type, InputField::Path]
-    };
+    let fields_to_show = app.form.fields_in_order();
 
     let num_fields = fields_to_show.len();
 

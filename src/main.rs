@@ -2636,7 +2636,8 @@ async fn handle_form_input(
 ) -> Result<()> {
     let field_count = app.form.field_count();
     let focused = app.form.focused_field;
-    let current_field = InputField::from_index(focused);
+    let current_field = app.form.current_field();
+    let storage = current_field.index();
 
     match code {
         KeyCode::Esc => {
@@ -2652,7 +2653,7 @@ async fn handle_form_input(
         }
         KeyCode::Tab | KeyCode::Down => {
             app.form.focused_field = (focused + 1) % field_count;
-            app.form.cursor_pos = app.form.fields[app.form.focused_field].chars().count();
+            app.form.cursor_pos = app.form.fields[app.form.current_field().index()].chars().count();
             app.clear_status();
         }
         KeyCode::BackTab | KeyCode::Up => {
@@ -2661,7 +2662,7 @@ async fn handle_form_input(
             } else {
                 focused - 1
             };
-            app.form.cursor_pos = app.form.fields[app.form.focused_field].chars().count();
+            app.form.cursor_pos = app.form.fields[app.form.current_field().index()].chars().count();
             app.clear_status();
         }
         KeyCode::Char(' ') | KeyCode::Left | KeyCode::Right
@@ -2676,7 +2677,7 @@ async fn handle_form_input(
             }
         }
         KeyCode::Right => {
-            let len = app.form.fields[focused].chars().count();
+            let len = app.form.fields[storage].chars().count();
             if app.form.cursor_pos < len {
                 app.form.cursor_pos += 1;
             }
@@ -2685,7 +2686,7 @@ async fn handle_form_input(
             app.form.cursor_pos = 0;
         }
         KeyCode::End => {
-            app.form.cursor_pos = app.form.fields[focused].chars().count();
+            app.form.cursor_pos = app.form.fields[storage].chars().count();
         }
         KeyCode::Char('z') if app.form.is_ssh && modifiers.contains(KeyModifiers::CONTROL) => {
             if app.form.is_ssh {
@@ -2760,7 +2761,7 @@ async fn handle_form_input(
         }
         KeyCode::Backspace => {
             if current_field != InputField::Type && app.form.cursor_pos > 0 {
-                let val = &mut app.form.fields[focused];
+                let val = &mut app.form.fields[storage];
                 let byte_pos = val.char_indices()
                     .nth(app.form.cursor_pos - 1)
                     .map(|(i, _)| i)
@@ -2772,7 +2773,7 @@ async fn handle_form_input(
         }
         KeyCode::Delete => {
             if current_field != InputField::Type {
-                let val = &mut app.form.fields[focused];
+                let val = &mut app.form.fields[storage];
                 let len = val.chars().count();
                 if app.form.cursor_pos < len {
                     let byte_pos = val.char_indices()
@@ -2793,7 +2794,7 @@ async fn handle_form_input(
                 } else {
                     c
                 };
-                let val = &mut app.form.fields[focused];
+                let val = &mut app.form.fields[storage];
                 let byte_pos = val.char_indices()
                     .nth(app.form.cursor_pos)
                     .map(|(i, _)| i)

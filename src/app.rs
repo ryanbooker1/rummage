@@ -12,7 +12,7 @@ pub enum Screen {
     AddLocation { editing_id: Option<String> },
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InputField {
     Name,
     Type,
@@ -209,6 +209,29 @@ impl LocationForm {
 
     pub fn field_count(&self) -> usize {
         if self.is_ssh { 7 } else { 3 }
+    }
+
+    pub fn fields_in_order(&self) -> Vec<InputField> {
+        if self.is_ssh {
+            vec![
+                InputField::Name,
+                InputField::Type,
+                InputField::SshHost,
+                InputField::SshPort,
+                InputField::Path,
+                InputField::SshUser,
+                InputField::SshPassword,
+            ]
+        } else {
+            vec![InputField::Name, InputField::Type, InputField::Path]
+        }
+    }
+
+    pub fn current_field(&self) -> InputField {
+        self.fields_in_order()
+            .get(self.focused_field)
+            .copied()
+            .unwrap_or(InputField::Name)
     }
 }
 
