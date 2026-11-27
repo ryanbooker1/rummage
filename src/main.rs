@@ -3016,7 +3016,7 @@ async fn save_location_form(
     let plain_cred = had_ssh_password
         && !app.config.settings.require_unlock_on_startup;
     app.location_saved_msg = Some(if plain_cred {
-        "Saved — ⚠ password stored as plain text (open Settings → Encrypt credentials to protect it)".to_string()
+        "Saved — ⚠ plain text password · enable Encrypt credentials in Settings".to_string()
     } else {
         "Location saved — press ^R to rebuild index".to_string()
     });
