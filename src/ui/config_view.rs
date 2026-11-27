@@ -271,10 +271,10 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
             Line::from(vec![
                 Span::styled("  ", Style::default().bg(BG)),
                 Span::styled(local_indicator, local_style),
-                Span::styled(" Local", local_style),
+                Span::styled(" Local", Style::default().fg(FG4).bg(BG)),
                 Span::styled("    ", Style::default().bg(BG)),
                 Span::styled(ssh_indicator, ssh_style),
-                Span::styled(" SSH", ssh_style),
+                Span::styled(" SSH", Style::default().fg(FG4).bg(BG)),
                 Span::styled("    ◄► or Space to switch", hint_style),
             ])
         } else {
