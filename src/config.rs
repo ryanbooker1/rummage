@@ -69,7 +69,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            require_unlock_on_startup: false,
+            require_unlock_on_startup: true,
             consecutive_search: false,
             case_sensitive_search: false,
             content_search: false,

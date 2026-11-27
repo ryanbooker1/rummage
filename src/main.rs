@@ -252,7 +252,11 @@ async fn run_app(
                     // Extract location name from error message for persistent display
                     let short = if let Some(rest) = msg.strip_prefix("SSH failed for '") {
                         let loc_name = rest.split('\'').next().unwrap_or(&msg).to_string();
-                        let err = msg.split(':').last().unwrap_or("connection failed").trim().to_string();
+                        let err = if msg.contains("key has changed") || msg.contains("man-in-the-middle") {
+                            "⚠ HOST KEY MISMATCH — possible attack (see ^N for details)".to_string()
+                        } else {
+                            msg.split(':').last().unwrap_or("connection failed").trim().to_string()
+                        };
                         (loc_name, err)
                     } else {
                         ("unknown".to_string(), msg.chars().take(60).collect())
@@ -393,7 +397,11 @@ async fn run_app(
                 NameSearchMsg::Error(msg) => {
                     // Extract location name from "SSH connect failed for 'X'" or similar
                     let loc_name = msg.split('\'').nth(1).unwrap_or("SSH").to_string();
-                    let short_err = msg.split(':').last().unwrap_or(&msg).trim().to_string();
+                    let short_err = if msg.contains("key has changed") || msg.contains("man-in-the-middle") {
+                        "⚠ HOST KEY MISMATCH — possible attack (see ^N for details)".to_string()
+                    } else {
+                        msg.split(':').last().unwrap_or(&msg).trim().to_string()
+                    };
                     if !app.location_errors.iter().any(|(n, _)| n == &loc_name) {
                         app.location_errors.push((loc_name, short_err));
                     }
@@ -2915,6 +2923,18 @@ async fn save_location_form(
         return Ok(());
     }
 
+    // Path safety hint — warn once if the path looks like it contains credentials.
+    const SENSITIVE_DIRS: &[&str] = &[".ssh", ".gnupg", ".aws", ".kube", ".password-store"];
+    let path_lc = path.to_lowercase();
+    if SENSITIVE_DIRS.iter().any(|d| path_lc.contains(d)) && !app.form.path_warn_shown {
+        app.form.path_warn_shown = true;
+        app.set_status(
+            "⚠ This path may contain sensitive files — filenames will be indexed. Press Enter again to confirm.",
+            StatusLevel::Warning,
+        );
+        return Ok(());
+    }
+
     let kind = if app.form.is_ssh { "ssh" } else { "local" };
 
     if kind == "local" {
@@ -2991,7 +3011,14 @@ async fn save_location_form(
     } else {
         app.screen = Screen::Config;
     }
-    app.location_saved_msg = Some("Location saved — press ^R to rebuild index".to_string());
+    let plain_cred = app.form.is_ssh
+        && !ssh_password.is_empty()
+        && !app.config.settings.require_unlock_on_startup;
+    app.location_saved_msg = Some(if plain_cred {
+        "Saved — ⚠ password stored as plain text (open Settings → Encrypt credentials to protect it)".to_string()
+    } else {
+        "Location saved — press ^R to rebuild index".to_string()
+    });
 
     Ok(())
 }

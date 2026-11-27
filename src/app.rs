@@ -168,6 +168,8 @@ pub struct LocationForm {
     pub focused_field: usize,
     pub is_ssh: bool,
     pub cursor_pos: usize,
+    /// True after the first Enter on a sensitive path — next Enter saves anyway.
+    pub path_warn_shown: bool,
 }
 
 impl Default for LocationForm {
@@ -185,6 +187,7 @@ impl Default for LocationForm {
             focused_field: 0,
             is_ssh: false,
             cursor_pos: 0,
+            path_warn_shown: false,
         }
     }
 }

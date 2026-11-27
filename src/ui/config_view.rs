@@ -7,7 +7,7 @@ use ratatui::{
 };
 
 use crate::app::{App, InputField, Screen, StatusLevel};
-use crate::ui::theme::{Theme, BG, FG, FG4, AQUA, YELLOW};
+use crate::ui::theme::{Theme, BG, FG, FG4, AQUA, YELLOW, GREEN};
 
 pub fn render(f: &mut Frame, app: &App) {
     let area = f.area();
@@ -102,9 +102,21 @@ fn render_locations(f: &mut Frame, area: Rect, app: &App) {
             let kind_display = if loc.kind == "ssh" {
                 let host = loc.ssh_host.as_deref().unwrap_or("unknown");
                 let user = loc.ssh_user.as_deref().unwrap_or("user");
-                format!("(ssh: {}@{}:{})", user, host, loc.ssh_port)
+                format!("(ssh: {}@{}:{}) ", user, host, loc.ssh_port)
             } else {
                 "(local)".to_string()
+            };
+
+            // Credential storage badge for SSH locations that have a saved password.
+            let has_cred = loc.kind == "ssh" && app.credentials.contains_key(&loc.id);
+            let (cred_badge, cred_style) = if has_cred {
+                if app.config.settings.require_unlock_on_startup {
+                    ("[enc]", Style::default().fg(GREEN))
+                } else {
+                    ("[plain]", Style::default().fg(YELLOW))
+                }
+            } else {
+                ("", Style::default().fg(FG4))
             };
 
             let line = Line::from(vec![
@@ -115,6 +127,7 @@ fn render_locations(f: &mut Frame, area: Rect, app: &App) {
                 Span::styled(path_display, Theme::dim()),
                 Span::raw("  "),
                 Span::styled(kind_display, Theme::dim()),
+                Span::styled(cred_badge, cred_style),
             ]);
 
             ListItem::new(line)

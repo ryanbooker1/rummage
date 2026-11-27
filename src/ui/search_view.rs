@@ -1438,7 +1438,10 @@ fn render_popup_settings(f: &mut Frame, area: Rect, app: &App) {
     f.render_widget(Paragraph::new(Span::styled(index_header, Theme::header())), chunks[17]);
 
     // Setting rows — pill_row(label, shortcut, &[(val, is_active)], selected)
-    f.render_widget(Paragraph::new(pill_row("Require unlock", "", &[
+    let has_ssh_plain = !app.config.settings.require_unlock_on_startup
+        && app.config.locations.iter().any(|l| l.kind == "ssh" && app.credentials.contains_key(&l.id));
+    let encrypt_label = if has_ssh_plain { "Encrypt credentials ⚠" } else { "Encrypt credentials" };
+    f.render_widget(Paragraph::new(pill_row(encrypt_label, "", &[
         ("OFF", !app.config.settings.require_unlock_on_startup),
         ("ON",  app.config.settings.require_unlock_on_startup),
     ], active == 0)), chunks[1]);
@@ -1601,7 +1604,7 @@ fn action_row(label: &str, shortcut: &str, selected: bool) -> Line<'static> {
 
 /// Descriptions shown in the 'i' info popup for each settings item (indexed 0–10).
 const SETTING_INFO: &[(&str, &str)] = &[
-    ("Require unlock",    "Encrypts SSH passwords with your master password.\nWhen OFF, passwords are stored as plain JSON (600 perms).\nChanges take effect on next startup."),
+    ("Encrypt credentials", "When ON, SSH passwords are encrypted with a master password\nyou set on first use. When OFF, passwords are stored as plain\ntext in ~/.config/rummage/credentials.json (mode 600 —\nreadable only by you, but unencrypted on disk).\nChanges take effect on next startup."),
     ("Fuzzy match",          "When ON, letters can be non-adjacent (e.g. 'ac' matches 'abc').\nWhen OFF, letters must appear consecutively\n(e.g. 'abc' matches 'abcdef' but not 'axbxc')."),
     ("Search file content",  "When ON, also searches inside file contents (like grep).\nMuch slower than filename-only search.\n^F toggles this during a search session."),
     ("Search target",     "Controls what appears in results:\n  files — files only\n  dirs  — directories only\n  all   — both files and directories"),
