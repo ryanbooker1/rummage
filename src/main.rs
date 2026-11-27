@@ -2965,6 +2965,8 @@ async fn save_location_form(
         (None, 22u16, None, String::new())
     };
 
+    let had_ssh_password = app.form.is_ssh && !ssh_password.is_empty();
+
     if let Some(id) = editing_id {
         // Update existing
         if let Some(loc) = config.locations.iter_mut().find(|l| &l.id == id) {
@@ -2976,7 +2978,7 @@ async fn save_location_form(
             loc.ssh_user = ssh_user;
         }
         // Update credentials if SSH
-        if app.form.is_ssh && !ssh_password.is_empty() {
+        if had_ssh_password {
             app.credentials.insert(id.clone(), ssh_password);
             save_credentials(app, config)?;
         }
@@ -2995,7 +2997,7 @@ async fn save_location_form(
         };
         config.locations.push(loc);
 
-        if app.form.is_ssh && !ssh_password.is_empty() {
+        if had_ssh_password {
             app.credentials.insert(id, ssh_password);
             save_credentials(app, config)?;
         }
@@ -3011,8 +3013,7 @@ async fn save_location_form(
     } else {
         app.screen = Screen::Config;
     }
-    let plain_cred = app.form.is_ssh
-        && !ssh_password.is_empty()
+    let plain_cred = had_ssh_password
         && !app.config.settings.require_unlock_on_startup;
     app.location_saved_msg = Some(if plain_cred {
         "Saved — ⚠ password stored as plain text (open Settings → Encrypt credentials to protect it)".to_string()

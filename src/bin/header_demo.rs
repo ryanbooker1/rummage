@@ -141,7 +141,7 @@ fn main() -> io::Result<()> {
 fn opt1(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 0, Line::from(""));
     row(f, area, 1, Line::from(vec![
-        Span::styled(" bs", bold(AQUA)),
+        Span::styled(" rum", bold(AQUA)),
         sp(BG),
         Span::styled("│", fg(BG2)),
         sp(BG),
@@ -196,7 +196,7 @@ fn opt2(f: &mut ratatui::Frame, area: Rect) {
 fn opt3(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 0, Line::from(""));
     row(f, area, 1, Line::from(vec![
-        Span::styled(" bs ", inv_bold(BG, AQUA)),
+        Span::styled(" rum ", inv_bold(BG, AQUA)),
         Span::styled("▶", inv(AQUA, BG1)),
         Span::styled(" 42 results ", inv(FG, BG1)),
         Span::styled("▶", inv(BG1, BG2)),
@@ -217,7 +217,7 @@ fn opt3(f: &mut ratatui::Frame, area: Rect) {
 fn opt4(f: &mut ratatui::Frame, area: Rect) {
     let w = area.width as usize;
     let inner = w.saturating_sub(2);
-    let top    = format!("╭─ bs ─{}─ 42 results ─╮", "─".repeat(inner.saturating_sub(20)));
+    let top    = format!("╭─ rum ─{}─ 42 results ─╮", "─".repeat(inner.saturating_sub(20)));
     let middle = format!("│  mode:index   target:files   content:off   case:off{:>pad$}│",
         "", pad = inner.saturating_sub(50));
     let bottom = format!("╰{}╯", "─".repeat(inner));
@@ -268,7 +268,7 @@ fn opt6(f: &mut ratatui::Frame, area: Rect) {
         Span::styled("▶", inv(ORANGE, BG)),
         Span::styled("  FILES ", inv_bold(BG1, BG)),
         Span::styled("│", fg(BG2)),
-        Span::styled("  bs  ", bold(AQUA)),
+        Span::styled("  rum  ", bold(AQUA)),
         Span::styled("  42 results", bold(FG)),
         Span::styled("   content:off  case:off  consec:off", fg(FG4)),
     ]));
@@ -283,7 +283,7 @@ fn opt6(f: &mut ratatui::Frame, area: Rect) {
 fn opt7(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 0, Line::from(""));
     row(f, area, 1, Line::from(vec![
-        Span::styled(" bs", bold(AQUA)),
+        Span::styled(" rum", bold(AQUA)),
         Span::styled("   42 results", bold(FG)),
         Span::styled("     ", fg(BG)),
         Span::styled("◉ ", fg(YELLOW)),
@@ -338,7 +338,7 @@ fn opt8(f: &mut ratatui::Frame, area: Rect) {
 fn opt9(f: &mut ratatui::Frame, area: Rect) {
     row(f, area, 0, Line::from(""));
     row(f, area, 1, Line::from(vec![
-        Span::styled(" bs", bold(AQUA)),
+        Span::styled(" rum", bold(AQUA)),
         Span::styled("  ›  ", fg(BG4)),
         Span::styled("index", fg(YELLOW)),
         Span::styled("  ›  ", fg(BG4)),
@@ -360,7 +360,7 @@ fn opt10(f: &mut ratatui::Frame, area: Rect) {
     let w = area.width as usize;
     // Build left side
     let left_spans: Vec<Span> = vec![
-        Span::styled(" bs", bold(AQUA)),
+        Span::styled(" rum", bold(AQUA)),
         Span::styled("   ", fg(BG)),
         Span::styled("INDEX", inv_bold(BG, BG2)),
         Span::styled(" ", fg(BG)),
