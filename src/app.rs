@@ -198,6 +198,8 @@ impl LocationForm {
         if self.is_ssh { 7 } else { 3 }
     }
 
+    /// Display order for form fields — single source of truth used by both
+    /// the renderer and the key-handler.
     pub fn fields_in_order(&self) -> Vec<InputField> {
         if self.is_ssh {
             vec![
@@ -449,6 +451,8 @@ pub struct App {
     pub search_pending: bool,
     /// Fires once when the background index load (deferred from startup) completes.
     pub index_load_done_rx: Option<tokio::sync::oneshot::Receiver<()>>,
+    /// True while the "plain-text credentials" warning popup is showing in the location form.
+    pub ssh_plain_warn: bool,
 }
 
 impl App {
@@ -549,6 +553,7 @@ impl App {
             show_debug_overlay: false,
             search_pending: false,
             index_load_done_rx: None,
+            ssh_plain_warn: false,
         }
     }
 

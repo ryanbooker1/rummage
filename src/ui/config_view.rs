@@ -30,6 +30,9 @@ pub fn render(f: &mut Frame, app: &App) {
     // Add/Edit modal overlay
     if let Screen::AddLocation { .. } = &app.screen {
         render_location_form(f, area, app);
+        if app.ssh_plain_warn {
+            render_ssh_plain_warn(f, area);
+        }
     }
 
     // Delete confirmation overlay
@@ -343,6 +346,67 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
             footer_area,
         );
     }
+}
+
+fn render_ssh_plain_warn(f: &mut Frame, area: Rect) {
+    use ratatui::style::Color;
+    let modal_width = 52u16.min(area.width.saturating_sub(4));
+    let modal_height = 7u16;
+    let x = (area.width.saturating_sub(modal_width)) / 2;
+    let y = (area.height.saturating_sub(modal_height)) / 2;
+    let modal_area = Rect::new(x, y, modal_width, modal_height);
+
+    f.render_widget(Clear, modal_area);
+
+    let block = Block::default()
+        .style(Style::default().bg(BG))
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(YELLOW))
+        .title(Span::styled(" ⚠ Security Warning ", Style::default().fg(YELLOW)));
+
+    let inner = block.inner(modal_area);
+    f.render_widget(block, modal_area);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(2), // warning text
+            Constraint::Length(1), // blank
+            Constraint::Length(1), // question
+            Constraint::Min(1),    // controls
+        ])
+        .split(inner);
+
+    let warn_style = Style::default().fg(Color::White).bg(BG);
+    f.render_widget(
+        Paragraph::new("SSH passwords will be stored in plain text.\nAnyone with access to your home dir can read them.")
+            .style(warn_style)
+            .wrap(Wrap { trim: false }),
+        chunks[0],
+    );
+
+    f.render_widget(
+        Paragraph::new(Span::styled(
+            "Enable encryption to protect them?",
+            Style::default().fg(FG).bg(BG),
+        )),
+        chunks[2],
+    );
+
+    let controls = Line::from(vec![
+        Span::styled("Y", Theme::success()),
+        Span::styled(" Enable encryption  ", Style::default().fg(FG4).bg(BG)),
+        Span::styled("N", Theme::primary()),
+        Span::styled("/", Style::default().fg(FG4).bg(BG)),
+        Span::styled("Enter", Theme::primary()),
+        Span::styled(" Continue  ", Style::default().fg(FG4).bg(BG)),
+        Span::styled("Esc", Theme::primary()),
+        Span::styled(" Cancel", Style::default().fg(FG4).bg(BG)),
+    ]);
+    f.render_widget(
+        Paragraph::new(controls).style(Style::default().bg(BG)),
+        chunks[3],
+    );
 }
 
 pub fn render_delete_confirm(f: &mut Frame, area: Rect, app: &App) {

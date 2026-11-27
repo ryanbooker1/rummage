@@ -2675,6 +2675,30 @@ async fn handle_form_input(
     db_file: &std::path::Path,
     terminal: &mut ratatui::Terminal<ratatui::backend::CrosstermBackend<io::Stdout>>,
 ) -> Result<()> {
+    // Handle the plain-text SSH warning popup before anything else.
+    if app.ssh_plain_warn {
+        match code {
+            KeyCode::Char('y') | KeyCode::Char('Y') => {
+                app.config.settings.require_unlock_on_startup = true;
+                config.settings.require_unlock_on_startup = true;
+                config.save().ok();
+                app.form.is_ssh = true;
+                app.ssh_plain_warn = false;
+            }
+            // N, Enter, or Esc all dismiss; Esc cancels the switch, N/Enter proceed plain.
+            KeyCode::Esc => {
+                app.ssh_plain_warn = false;
+                // Don't switch to SSH.
+            }
+            _ => {
+                // N, Enter, or any other key → proceed without encryption.
+                app.form.is_ssh = true;
+                app.ssh_plain_warn = false;
+            }
+        }
+        return Ok(());
+    }
+
     let field_count = app.form.field_count();
     let focused = app.form.focused_field;
     let current_field = app.form.current_field();
@@ -2709,7 +2733,12 @@ async fn handle_form_input(
         KeyCode::Char(' ') | KeyCode::Left | KeyCode::Right
             if current_field == InputField::Type =>
         {
-            app.form.is_ssh = !app.form.is_ssh;
+            let switching_to_ssh = !app.form.is_ssh;
+            if switching_to_ssh && !app.config.settings.require_unlock_on_startup {
+                app.ssh_plain_warn = true;
+            } else {
+                app.form.is_ssh = !app.form.is_ssh;
+            }
             app.clear_status();
         }
         KeyCode::Left => {
