@@ -91,6 +91,9 @@ pub fn render(f: &mut Frame, app: &App) {
     if let crate::app::Screen::AddLocation { .. } = &app.screen {
         if app.return_to_popup {
             config_view::render_location_form(f, area, app);
+            if app.ssh_plain_warn {
+                config_view::render_ssh_plain_warn(f, area);
+            }
         }
     }
 

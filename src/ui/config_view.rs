@@ -361,7 +361,7 @@ pub fn render_location_form(f: &mut Frame, area: Rect, app: &App) {
     }
 }
 
-fn render_ssh_plain_warn(f: &mut Frame, area: Rect) {
+pub fn render_ssh_plain_warn(f: &mut Frame, area: Rect) {
     use ratatui::style::Color;
     let modal_width = 52u16.min(area.width.saturating_sub(4));
     let modal_height = 7u16;
